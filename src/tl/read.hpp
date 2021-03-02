@@ -18,7 +18,8 @@ namespace tl::read {
  * @param output where the input is wrote to.
  */
 template<concepts::is_trivially_copyable outputT>
-void value(std::span<const char> input, outputT &output)
+static void
+  value(std::span<const char> input, outputT &output)
 {
   std::memcpy(&output, std::ranges::data(input), sizeof(outputT));
 }
@@ -30,7 +31,8 @@ void value(std::span<const char> input, outputT &output)
  * @note modifies input to offset of bytes read.
  */
 template<concepts::is_trivially_copyable outputT>
-void value(std::span<const char> *const input, outputT &output)
+static void
+  value(std::span<const char> *const input, outputT &output)
 {
   value(*input, output);
   *input = input->subspan(sizeof(outputT));
@@ -42,8 +44,9 @@ void value(std::span<const char> *const input, outputT &output)
    * @note modifies input to offset of bytes read.
    */
 template<concepts::is_trivially_copyable... outputT>
-requires(sizeof...(outputT) > 1U) void value(std::span<const char> *const input,
-                                             outputT &...output)
+requires(sizeof...(outputT)
+         > 1U) static void value(std::span<const char> *const input,
+                                 outputT &...output)
 {
   (value(input, output), ...);
 }
@@ -54,8 +57,8 @@ requires(sizeof...(outputT) > 1U) void value(std::span<const char> *const input,
  * @param output where the input is wrote to.
  */
 template<concepts::is_trivially_copyable... outputT>
-requires(sizeof...(outputT) > 1U) void value(std::span<const char> input,
-                                             outputT &...output)
+requires(sizeof...(outputT) > 1U) static void value(std::span<const char> input,
+                                                    outputT &...output)
 {
   value(&input, output...);
 }
@@ -66,41 +69,97 @@ requires(sizeof...(outputT) > 1U) void value(std::span<const char> input,
  * @param output where the input is wrote to.
  */
 template<concepts::is_trivially_copyable... outputT>
-void value(std::istream &input, outputT &...output)
+static void
+  value(std::istream &input, outputT &...output)
 {
   constexpr auto         size = (sizeof(outputT) + ...);
   std::array<char, size> tmp{};
   input.read(std::ranges::data(tmp), size);
   value(tmp, output...);
 }
+/**
+ * Read one value
+ * @tparam outputT trivially_copyable and default constructable, need to take
+ * sizeof(outputT)
+ * @param input input source of data.
+ * @return value
+ */
 template<concepts::is_trivially_copyable_and_default_constructible outputT>
-outputT value(std::span<const char> input)
+static outputT
+  value(std::span<const char> input)
 {
   auto output = outputT{};
-  value(input,output);
+  value(input, output);
   return output;
 }
-
+/**
+ * Read one value
+ * @tparam outputT trivially_copyable and default constructable, need to take
+ * sizeof(outputT)
+ * @param input input source of data.
+ * @return value
+ * @note modifies input to offset of bytes read.
+ */
 template<concepts::is_trivially_copyable_and_default_constructible outputT>
-outputT value(std::span<const char> * const input)
+static outputT
+  value(std::span<const char> *const input)
 {
-
   auto output = value<outputT>(*input);
-  *input = input->subspan(sizeof(outputT));
+  *input      = input->subspan(sizeof(outputT));
   return output;
 }
-
+/**
+ * Read all values
+ * @tparam outputT trivially_copyable and default constructable, need to take
+ * sizeof(outputT)
+ * @param input source of data.
+ * @return tuple of values.
+ * @note modifies input to offset of bytes read.
+ */
 template<concepts::is_trivially_copyable_and_default_constructible... outputT>
-requires(sizeof...(outputT)>1)
-auto value(std::span<const char> * const input)
+requires(sizeof...(outputT)
+         > 1) static auto value(std::span<const char> *const input)
 {
-  return std::tuple<outputT...>{value<outputT>(input)...};
+  return std::tuple<outputT...>{ value<outputT>(input)... };
 }
+/**
+ * Read all values
+ * @tparam outputT trivially_copyable and default constructable, need to take
+ * sizeof(outputT)
+ * @param input source of data.
+ * @return tuple of values.
+ */
 template<concepts::is_trivially_copyable_and_default_constructible... outputT>
-requires(sizeof...(outputT)>1)
-auto value(std::span<const char> input)
+requires(sizeof...(outputT) > 1) static auto value(std::span<const char> input)
 {
   return value<outputT...>(&input);
+}
+/**
+ * Read one value
+ * @tparam outputT trivially_copyable and default constructable, need to take
+ * sizeof(outputT)
+ * @param input stream of data.
+ * @return value
+ */
+template<concepts::is_trivially_copyable_and_default_constructible outputT>
+static outputT
+  value(std::istream &input)
+{
+  auto output = outputT{};
+  value(input, output);
+  return output;
+}
+/**
+ * Read all values
+ * @tparam outputT trivially_copyable and default constructable, need to take
+ * sizeof(outputT)
+ * @param input stream of data.
+ * @return tuple of values.
+ */
+template<concepts::is_trivially_copyable_and_default_constructible... outputT>
+requires(sizeof...(outputT) > 1) static auto value(std::istream &input)
+{
+  return std::tuple<outputT...>{ value<outputT>(input)... };
 }
 namespace safe {
   /**
@@ -117,7 +176,8 @@ namespace safe {
   {
     read::value(i, o);
   }
-  void value(inputT input, outputT &output)
+  static void
+    value(inputT input, outputT &output)
   {
     std::size_t size = [&input, &output] {
       if constexpr (std::is_pointer_v<inputT>) {
@@ -141,7 +201,7 @@ namespace safe {
   template<concepts::is_trivially_copyable... outputT, typename inputT>
   requires(sizeof...(outputT) > 1U && requires(inputT i, outputT... o) {
     (value(i, o), ...);
-  }) void value(inputT input, outputT &...output)
+  }) static void value(inputT input, outputT &...output)
   {
     if constexpr (std::is_pointer_v<inputT>) {
       (value(input, output), ...);
@@ -149,10 +209,12 @@ namespace safe {
       (value(&input, output), ...);
     }
   }
-  void sizeof_stream(std::istream &              input,
-                     const std::fpos<mbstate_t> &current,
-                     const std::fpos<mbstate_t> &end);
-  auto sizeof_stream(std::istream &input)
+  /**
+   * get size of remaining istream, from current point.
+   * @param input stream of data.
+   */
+  static auto
+    sizeof_stream(std::istream &input)
   {
     const auto current = input.tellg();
     input.seekg(0, std::ios::end);
@@ -167,7 +229,8 @@ namespace safe {
    * @param output where the input is wrote to.
    */
   template<concepts::is_trivially_copyable... outputT>
-  void value(std::istream &input, outputT &...output)
+  static void
+    value(std::istream &input, outputT &...output)
   {
     auto       remaining = sizeof_stream(input);
     const auto lambda    = [&input, &remaining](auto &one_item) {
@@ -177,6 +240,71 @@ namespace safe {
       }
     };
     (lambda(output), ...);
+  }
+  /**
+   * Read all these values from stream
+   * @tparam outputT trivially_copyable and default constructable, need to take
+   * sizeof(outputT)
+   * @param input source of data.
+   * @return value if only 1 or a tuple of values if more.
+   * @note modifies input to offset of bytes read.
+   */
+  template<concepts::is_trivially_copyable_and_default_constructible... outputT>
+  static auto
+    value(std::span<const char> *const input)
+  {
+    auto       remaining = std::ranges::size(*input);
+    const auto lambda    = [&input, &remaining]<typename oneT>() {
+      if (remaining >= sizeof(oneT)) {
+        remaining -= sizeof(oneT);
+        return read::value<oneT>(input);
+      }
+      return oneT{};
+    };
+    if constexpr (sizeof...(outputT) > 1) {
+      return std::tuple<outputT...>{ lambda.template operator()<outputT>()... };
+    } else if constexpr (sizeof...(outputT) == 1) {
+      return lambda.template operator()<outputT...>();
+    }
+  }
+  /**
+   * Read all these values from stream
+   * @tparam outputT trivially_copyable and default constructable, need to take
+   * sizeof(outputT)
+   * @param input source of data.
+   * @return value if only 1 or a tuple of values if more.
+   */
+  template<concepts::is_trivially_copyable_and_default_constructible... outputT>
+  static auto
+    value(std::span<const char> input)
+  {
+    return value<outputT...>(&input);
+  }
+  /**
+   * Read all these values from stream
+   * @tparam outputT trivially_copyable and default constructable, need to take
+   * sizeof(outputT)
+   * @param input source of data.
+   * @return value if only 1 or a tuple of values if more.
+   * @note modifies input to offset of bytes read.
+   */
+  template<concepts::is_trivially_copyable_and_default_constructible... outputT>
+  static auto
+    value(std::istream &input)
+  {
+    auto       remaining = sizeof_stream(input);
+    const auto lambda    = [&input, &remaining]<typename oneT>() {
+      if (remaining >= sizeof(oneT)) {
+        remaining -= sizeof(oneT);
+        return read::value<oneT>(input);
+      }
+      return oneT{};
+    };
+    if constexpr (sizeof...(outputT) > 1) {
+      return std::tuple<outputT...>{ lambda.template operator()<outputT>()... };
+    } else if constexpr (sizeof...(outputT) == 1) {
+      return lambda.template operator()<outputT...>();
+    }
   }
 }// namespace safe
 }// namespace tl::read
