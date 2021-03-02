@@ -161,34 +161,90 @@ requires(sizeof...(outputT) > 1) static auto value(std::istream &input)
 {
   return std::tuple<outputT...>{ value<outputT>(input)... };
 }
+template<std::ranges::contiguous_range outputT>
+using value_type = std::decay_t<typename outputT::value_type>;
+template<std::ranges::contiguous_range outputT>
+static std::size_t
+  sizeof_range(const outputT &output)
+{
+  return sizeof(value_type<outputT>) * std::ranges::size(output);
+}
+template<std::ranges::contiguous_range outputT>
+static constexpr std::size_t
+  max_element_count(std::size_t size_bytes)
+{
+  return size_bytes / sizeof(value_type<outputT>);
+}
+template<concepts::is_contiguous_and_resizable outputT>
+static void
+  value(std::span<const char> input, outputT &output)
+{
+  const auto size = sizeof_range(output);
+  memcpy(std::ranges::data(output), std::ranges::data(input), size);
+}
+template<concepts::is_contiguous_and_resizable outputT>
+static void
+  value(std::span<const char> *const input, outputT &output)
+{
+  const auto size = sizeof_range(output);
+  value(*input, output);
+  *input = input->subspan(size);
+}
+template<concepts::is_contiguous_and_resizable outputT>
+static outputT
+  value(std::span<const char> input, const std::size_t size_in_bytes)
+{
+  outputT output{};
+  output.resize(max_element_count<outputT>(size_in_bytes));
+  value(input, output);
+  return output;
+}
+template<concepts::is_contiguous_and_resizable outputT>
+static outputT
+  value(std::span<const char> *const input, const std::size_t size_in_bytes)
+{
+  const auto size =
+    max_element_count<outputT>(size_in_bytes) * sizeof(value_type<outputT>);
+  const auto output = value<outputT>(*input, size_in_bytes);
+  *input            = input->subspan(size);
+  return output;
+}
 namespace safe {
   /**
    * Safe Read Value it checks the size of the span before hand.
    * @tparam outputT trivially_copyable, need to take sizeof(outputT)
-   * @tparam inputT type of input, using requires below to test if valid to pass
-   * to read::value
    * @param input source of data.
    * @param output where the input is wrote to.
    * @note doesn't throw any errors just doesn't do anything if lacking space
    */
-  template<concepts::is_trivially_copyable outputT, typename inputT>
-  requires requires(inputT i, outputT o)
+  template<concepts::is_trivially_copyable outputT>
+  requires requires(std::span<const char> *const i, outputT o)
   {
     read::value(i, o);
   }
   static void
-    value(inputT input, outputT &output)
+    value(std::span<const char> *const input, outputT &output)
   {
-    std::size_t size = [&input, &output] {
-      if constexpr (std::is_pointer_v<inputT>) {
-        return std::ranges::size(*input);
-      } else {
-        return std::ranges::size(input);
-      }
-    }();
-    if (sizeof(outputT) <= size) {
+    if (sizeof(outputT) <= std::ranges::size(*input)) {
       read::value(input, output);
     }
+  }
+  /**
+   * Safe Read Value it checks the size of the span before hand.
+   * @tparam outputT trivially_copyable, need to take sizeof(outputT)
+   * @param input source of data.
+   * @param output where the input is wrote to.
+   * @note doesn't throw any errors just doesn't do anything if lacking space
+   */
+  template<concepts::is_trivially_copyable outputT>
+  requires requires(std::span<const char> i, outputT o)
+  {
+    read::value(i, o);
+  }
+  static void
+    value(std::span<const char> input, outputT &output)
+  {
+    value(&input, output);
   }
   /**
    * Safe Read Value it checks the size of the span before hand.
@@ -197,17 +253,32 @@ namespace safe {
    * @param input source of data.
    * @param output where the input is wrote to.
    * @note reads values till it runs out of input
+   * @note modifies input to offset of bytes read.
    */
-  template<concepts::is_trivially_copyable... outputT, typename inputT>
-  requires(sizeof...(outputT) > 1U && requires(inputT i, outputT... o) {
-    (value(i, o), ...);
-  }) static void value(inputT input, outputT &...output)
+  template<concepts::is_trivially_copyable... outputT>
+  requires(sizeof...(outputT) > 1U
+           && (requires(std::span<const char> *const i, outputT... o) {
+                (value(i, o), ...);
+              })) static void value(std::span<const char> *const input,
+                                    outputT &...output)
   {
-    if constexpr (std::is_pointer_v<inputT>) {
-      (value(input, output), ...);
-    } else {
-      (value(&input, output), ...);
-    }
+    (value(input, output), ...);
+  }
+  /**
+   * Safe Read Value it checks the size of the span before hand.
+   * @tparam outputT trivially_copyable, need to take sizeof(outputT)
+   * @param input source of data.
+   * @param output where the input is wrote to.
+   * @note reads values till it runs out of input
+   */
+  template<concepts::is_trivially_copyable... outputT>
+  requires(sizeof...(outputT) > 1U
+           && (requires(std::span<const char> i, outputT... o) {
+                (value(i, o), ...);
+              })) static void value(std::span<const char> input,
+                                    outputT &...output)
+  {
+    value(&input, output...);
   }
   /**
    * get size of remaining istream, from current point.
@@ -305,6 +376,38 @@ namespace safe {
     } else if constexpr (sizeof...(outputT) == 1) {
       return lambda.template operator()<outputT...>();
     }
+  }
+  template<concepts::is_contiguous_and_resizable outputT>
+  static void
+    value(std::span<const char> *const input, outputT &output)
+  {
+    const auto size = sizeof_range(output);
+    if (size <= std::ranges::size(*input)) {
+      read::value(input, output);
+    }
+  }
+  template<concepts::is_contiguous_and_resizable outputT>
+  static void
+    value(std::span<const char> input, outputT &output)
+  {
+    value(&input, output);
+  }
+  template<concepts::is_contiguous_and_resizable outputT>
+  static outputT
+    value(std::span<const char> *const input, const std::size_t size_in_bytes)
+  {
+    const auto size =
+      max_element_count<outputT>(size_in_bytes) * sizeof(value_type<outputT>);
+    if (size <= std::ranges::size(*input)) {
+      return read::value<outputT>(input, size_in_bytes);
+    }
+    return outputT{};
+  }
+  template<concepts::is_contiguous_and_resizable outputT>
+  static outputT
+    value(std::span<const char> input, const std::size_t size_in_bytes)
+  {
+    return value<outputT>(&input, size_in_bytes);
   }
 }// namespace safe
 }// namespace tl::read
