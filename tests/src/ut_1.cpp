@@ -143,5 +143,56 @@ int main()
       expect(3_i == i3);
       expect(12_ul == std::ranges::size(span));
     };
+    "safe read int and return it and shift offset"_test = [&buffer] {
+      auto       span = std::span(buffer);
+      const auto i    = tl::read::safe::value<std::int32_t>(&span);
+      expect(1_i == i);
+      expect(0_ul == std::ranges::size(span));
+    };
+    "safe read int and return it and don't shift offset"_test = [&buffer] {
+      auto       span = std::span(buffer);
+      const auto i    = tl::read::safe::value<std::int32_t>(span);
+      expect(1_i == i);
+      expect(4_ul == std::ranges::size(span));
+    };
+    "read ints and return it and don't shift offset"_test = [&longer_buffer] {
+      auto span = std::span(longer_buffer);
+      const auto [i, i2, i3, i4] =
+      tl::read::safe::value<std::int32_t, std::int32_t, std::int32_t,std::int32_t>(span);
+      expect(1_i == i);
+      expect(2_i == i2);
+      expect(3_i == i3);
+      expect(0_i == i4);
+      expect(12_ul == std::ranges::size(span));
+    };
+    "read ints and return it and don't shift offset"_test = [&longer_buffer] {
+      auto span = std::span(longer_buffer);
+      const auto [i, i2, i3, i4] =
+      tl::read::safe::value<std::int32_t, std::int32_t, std::int32_t,std::int32_t>(&span);
+      expect(1_i == i);
+      expect(2_i == i2);
+      expect(3_i == i3);
+      expect(0_i == i4);
+      expect(0_ul == std::ranges::size(span));
+    };
+    "read int from stream"_test = [&ss] {
+      const auto [i,i2,i3] =
+      tl::read::value<std::int32_t,std::int32_t,std::int32_t>(ss);
+      expect(1_i == i);
+      expect(2_i == i2);
+      expect(3_i == i3);
+      expect(12_l == ss.tellg());
+      ss.seekg(0, std::ios::beg);
+    };
+    "read int from stream"_test = [&ss] {
+      const auto [i,i2,i3,i4] =
+      tl::read::safe::value<std::int32_t,std::int32_t,std::int32_t,std::int32_t>(ss);
+      expect(1_i == i);
+      expect(2_i == i2);
+      expect(3_i == i3);
+      expect(0_i == i4);
+      expect(12_l == ss.tellg());
+      ss.seekg(0, std::ios::beg);
+    };
   };
 }
