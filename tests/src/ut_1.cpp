@@ -296,7 +296,7 @@ int
     };
     "read vector of char return and shift offset"_test = [&buffer] {
       std::span span = buffer;
-      auto i = tl::read::value<std::vector<char>>(&span, 4U);
+      auto      i    = tl::read::value<std::vector<char>>(&span, 4U);
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
@@ -306,7 +306,55 @@ int
     };
     "read vector of char return and shift offset"_test = [&buffer] {
       std::span span = buffer;
-      auto i = tl::read::safe::value<std::vector<char>>(&span, 4U);
+      auto      i    = tl::read::safe::value<std::vector<char>>(&span, 4U);
+      expect(std::ranges::equal(buffer, i));
+      expect(0_ul == std::ranges::size(span));
+    };
+    "read string of char return"_test = [&buffer] {
+      auto i = tl::read::value<std::string>(buffer, 4U);
+      expect(std::ranges::equal(buffer, i));
+    };
+    "read string of char return and shift offset"_test = [&buffer] {
+      std::span span = buffer;
+      auto      i    = tl::read::value<std::string>(&span, 4U);
+      expect(std::ranges::equal(buffer, i));
+      expect(0_ul == std::ranges::size(span));
+    };
+    "read string of char return"_test = [&buffer] {
+      auto i = tl::read::safe::value<std::string>(buffer, 4U);
+      expect(std::ranges::equal(buffer, i));
+    };
+    "read string of char return and shift offset"_test = [&buffer] {
+      std::span span = buffer;
+      auto      i    = tl::read::safe::value<std::string>(&span, 4U);
+      expect(std::ranges::equal(buffer, i));
+      expect(0_ul == std::ranges::size(span));
+    };
+    "read string of char"_test = [&buffer] {
+      std::string i{};
+      i.resize(4);
+      tl::read::value(buffer, i);
+      expect(std::ranges::equal(buffer, i));
+    };
+    "read string of char and shift offset"_test = [&buffer] {
+      auto        span = std::span(buffer);
+      std::string i{};
+      i.resize(4);
+      tl::read::value(&span, i);
+      expect(std::ranges::equal(buffer, i));
+      expect(0_ul == std::ranges::size(span));
+    };
+    "safe read string of char"_test = [&buffer] {
+      std::string i{};
+      i.resize(4);
+      tl::read::safe::value(buffer, i);
+      expect(std::ranges::equal(buffer, i));
+    };
+    "safe read string of char and shift offset"_test = [&buffer] {
+      auto        span = std::span(buffer);
+      std::string i{};
+      i.resize(4);
+      tl::read::safe::value(&span, i);
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
