@@ -22,25 +22,25 @@ int
     };
     "read int"_test = [&buffer] {
       std::int32_t i{};
-      tl::read::value(buffer, i);
+      tl::read::input(buffer).output(i);
       expect(1_i == i);
     };
     "read int and shift offset"_test = [&buffer] {
       std::span    span = buffer;
       std::int32_t i{};
-      tl::read::value(&span, i);
+      tl::read::input(&span).output(i);
       expect(1_i == i);
       expect(std::ranges::size(span) == 0U);
     };
     "read safe int"_test = [&buffer] {
       std::int32_t i{};
-      tl::read::safe::value(std::span(buffer).subspan(0, 3), i);
+      tl::read::input(std::span(buffer).subspan(0, 3), true).output(i);
       expect(0_i == i);
     };
     "read safe int and shift offset"_test = [&buffer] {
       auto         span = std::span(buffer).subspan(0, 3);
       std::int32_t i{};
-      tl::read::safe::value(&span, i);
+      tl::read::input(&span, true).output(i);
       expect(0_i == i);
       expect(std::ranges::size(span) == 3U);
     };
@@ -48,7 +48,7 @@ int
       std::int32_t i{};
       std::int32_t i2{};
       std::int32_t i3{};
-      tl::read::value(longer_buffer, i, i2, i3);
+      tl::read::input(longer_buffer).output(i, i2, i3);
       expect(1_i == i);
       expect(2_i == i2);
       expect(3_i == i3);
@@ -58,7 +58,7 @@ int
       std::int32_t i{};
       std::int32_t i2{};
       std::int32_t i3{};
-      tl::read::value(&span, i, i2, i3);
+      tl::read::input(&span).output(i, i2, i3);
       expect(1_i == i);
       expect(2_i == i2);
       expect(3_i == i3);
@@ -69,7 +69,7 @@ int
       std::int32_t i{};
       std::int32_t i2{};
       std::int32_t i3{};
-      tl::read::safe::value(&span, i, i2, i3);
+      tl::read::input(&span, true).output(i, i2, i3);
       expect(1_i == i);
       expect(2_i == i2);
       expect(0_i == i3);
@@ -80,7 +80,7 @@ int
       std::int32_t i{};
       std::int32_t i2{};
       std::int32_t i3{};
-      tl::read::safe::value(span, i, i2, i3);
+      tl::read::input(span, true).output(i, i2, i3);
       expect(1_i == i);
       expect(2_i == i2);
       expect(0_i == i3);
@@ -88,7 +88,7 @@ int
     };
     "read int from stream"_test = [&ss] {
       std::int32_t i{};
-      tl::read::value(ss, i);
+      tl::read::input(&ss).output(i);
       expect(1_i == i);
       expect(4_l == ss.tellg());
       ss.seekg(0, std::ios::beg);
@@ -97,7 +97,7 @@ int
       std::int32_t i{};
       std::int32_t i2{};
       std::int32_t i3{};
-      tl::read::value(ss, i, i2, i3);
+      tl::read::input(&ss).output(i, i2, i3);
       expect(1_i == i);
       expect(2_i == i2);
       expect(3_i == i3);
@@ -109,7 +109,7 @@ int
       std::int32_t i2{};
       std::int32_t i3{};
       std::int32_t i4{};
-      tl::read::safe::value(ss, i, i2, i3, i4);
+      tl::read::input(&ss, true).output(i, i2, i3, i4);
       expect(1_i == i);
       expect(2_i == i2);
       expect(3_i == i3);
@@ -118,19 +118,20 @@ int
       ss.seekg(0, std::ios::beg);
     };
     "read int and return it"_test = [&buffer] {
-      const auto i = tl::read::value<std::int32_t>(buffer);
+      const auto i = tl::read::input(buffer).output<std::int32_t>();
       expect(1_i == i);
     };
     "read int and return it and shift offset"_test = [&buffer] {
       auto       span = std::span(buffer);
-      const auto i    = tl::read::value<std::int32_t>(&span);
+      const auto i    = tl::read::input(&span).output<std::int32_t>();
       expect(1_i == i);
       expect(0_ul == std::ranges::size(span));
     };
     "read ints and return it and shift offset"_test = [&longer_buffer] {
       auto span = std::span(longer_buffer);
       const auto [i, i2, i3] =
-        tl::read::value<std::int32_t, std::int32_t, std::int32_t>(&span);
+        tl::read::input(&span)
+          .output<std::int32_t, std::int32_t, std::int32_t>();
       expect(1_i == i);
       expect(2_i == i2);
       expect(3_i == i3);
@@ -139,7 +140,8 @@ int
     "read ints and return it and don't shift offset"_test = [&longer_buffer] {
       auto span = std::span(longer_buffer);
       const auto [i, i2, i3] =
-        tl::read::value<std::int32_t, std::int32_t, std::int32_t>(span);
+        tl::read::input(span)
+          .output<std::int32_t, std::int32_t, std::int32_t>();
       expect(1_i == i);
       expect(2_i == i2);
       expect(3_i == i3);
@@ -147,39 +149,43 @@ int
     };
     "safe read int and return it and shift offset"_test = [&buffer] {
       auto       span = std::span(buffer);
-      const auto i    = tl::read::safe::value<std::int32_t>(&span);
+      const auto i    = tl::read::input(&span, true).output<std::int32_t>();
       expect(1_i == i);
       expect(0_ul == std::ranges::size(span));
     };
     "safe read int and return it and don't shift offset"_test = [&buffer] {
       auto       span = std::span(buffer);
-      const auto i    = tl::read::safe::value<std::int32_t>(span);
+      const auto i    = tl::read::input(span, true).output<std::int32_t>();
       expect(1_i == i);
       expect(4_ul == std::ranges::size(span));
     };
-    "read ints and return it and don't shift offset"_test = [&longer_buffer] {
-      auto span                  = std::span(longer_buffer);
-      const auto [i, i2, i3, i4] = tl::read::safe::
-        value<std::int32_t, std::int32_t, std::int32_t, std::int32_t>(span);
-      expect(1_i == i);
-      expect(2_i == i2);
-      expect(3_i == i3);
-      expect(0_i == i4);
-      expect(12_ul == std::ranges::size(span));
-    };
-    "read ints and return it and don't shift offset"_test = [&longer_buffer] {
-      auto span                  = std::span(longer_buffer);
-      const auto [i, i2, i3, i4] = tl::read::safe::
-        value<std::int32_t, std::int32_t, std::int32_t, std::int32_t>(&span);
-      expect(1_i == i);
-      expect(2_i == i2);
-      expect(3_i == i3);
-      expect(0_i == i4);
-      expect(0_ul == std::ranges::size(span));
-    };
+    "safe read ints and return it and don't shift offset, expect one to not be wrote to."_test =
+      [&longer_buffer] {
+        auto span = std::span(longer_buffer);
+        const auto [i, i2, i3, i4] =
+          tl::read::input(span, true)
+            .output<std::int32_t, std::int32_t, std::int32_t, std::int32_t>();
+        expect(1_i == i);
+        expect(2_i == i2);
+        expect(3_i == i3);
+        expect(0_i == i4);
+        expect(12_ul == std::ranges::size(span));
+      };
+    "safe read ints and return it and shift offset, expect one to not be wrote to."_test =
+      [&longer_buffer] {
+        auto span = std::span(longer_buffer);
+        const auto [i, i2, i3, i4] =
+          tl::read::input(&span, true)
+            .output<std::int32_t, std::int32_t, std::int32_t, std::int32_t>();
+        expect(1_i == i);
+        expect(2_i == i2);
+        expect(3_i == i3);
+        expect(0_i == i4);
+        expect(0_ul == std::ranges::size(span));
+      };
     "read ints from stream"_test = [&ss] {
       const auto [i, i2, i3] =
-        tl::read::value<std::int32_t, std::int32_t, std::int32_t>(ss);
+        tl::read::input(&ss).output<std::int32_t, std::int32_t, std::int32_t>();
       expect(1_i == i);
       expect(2_i == i2);
       expect(3_i == i3);
@@ -187,8 +193,9 @@ int
       ss.seekg(0, std::ios::beg);
     };
     "safe read ints from stream"_test = [&ss] {
-      const auto [i, i2, i3, i4] = tl::read::safe::
-        value<std::int32_t, std::int32_t, std::int32_t, std::int32_t>(ss);
+      const auto [i, i2, i3, i4] =
+        tl::read::input(&ss, true)
+          .output<std::int32_t, std::int32_t, std::int32_t, std::int32_t>();
       expect(1_i == i);
       expect(2_i == i2);
       expect(3_i == i3);
@@ -198,163 +205,159 @@ int
     };
     "read array of char"_test = [&buffer] {
       std::array<char, 4> i{};
-      tl::read::value(buffer, i);
+      tl::read::input(buffer).output(i);
       expect(std::ranges::equal(buffer, i));
     };
     "read array of char return"_test = [&buffer] {
-      auto i = tl::read::value<std::array<char, 4>>(buffer);
+      auto i = tl::read::input(buffer).output<std::array<char, 4>>();
       expect(std::ranges::equal(buffer, i));
     };
     "safe read array of char"_test = [&buffer] {
       std::array<char, 4> i{};
-      tl::read::safe::value(buffer, i);
+      tl::read::input(buffer, true).output(i);
       expect(std::ranges::equal(buffer, i));
     };
     "safe read array of char return"_test = [&buffer] {
-      auto i = tl::read::safe::value<std::array<char, 4>>(buffer);
+      auto i = tl::read::input(buffer,true).output<std::array<char, 4>>();
       expect(std::ranges::equal(buffer, i));
     };
     "read array of char and shift offset"_test = [&buffer] {
       auto                span = std::span(buffer);
       std::array<char, 4> i{};
-      tl::read::value(&span, i);
+      tl::read::input(&span).output(i);
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
     "read array of char return and shift offset"_test = [&buffer] {
       auto span = std::span(buffer);
-      auto i    = tl::read::value<std::array<char, 4>>(&span);
+      auto i    = tl::read::input(&span).output<std::array<char, 4>>();
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
     "safe read array of char and shift offset"_test = [&buffer] {
       auto                span = std::span(buffer);
       std::array<char, 4> i{};
-      tl::read::safe::value(&span, i);
+      tl::read::input(&span, true).output(i);
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
     "safe read array of char return and shift offset"_test = [&buffer] {
       auto span = std::span(buffer);
-      auto i    = tl::read::safe::value<std::array<char, 4>>(&span);
+      auto i    = tl::read::input(&span, true).output<std::array<char, 4>>();
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
     "read array of char"_test = [&ss] {
       std::array<char, 4> i{};
-      tl::read::value(ss, i);
+      tl::read::input(&ss).output(i);
       expect(std::ranges::equal(ss.str().substr(0, 4), i));
       expect(4_l == ss.tellg());
       ss.seekg(0, std::ios::beg);
     };
     "read array of char return"_test = [&ss] {
-      auto i = tl::read::value<std::array<char, 4>>(ss);
+      auto i = tl::read::input(&ss).output<std::array<char, 4>>();
       expect(std::ranges::equal(ss.str().substr(0, 4), i));
       expect(4_l == ss.tellg());
       ss.seekg(0, std::ios::beg);
     };
     "safe read array of char"_test = [&ss] {
       std::array<char, 4> i{};
-      tl::read::safe::value(ss, i);
+      tl::read::input(&ss, true).output(i);
       expect(std::ranges::equal(ss.str().substr(0, 4), i));
       expect(4_l == ss.tellg());
       ss.seekg(0, std::ios::beg);
     };
     "safe read array of char return"_test = [&ss] {
-      auto i = tl::read::safe::value<std::array<char, 4>>(ss);
+      auto i = tl::read::input(&ss, true).output<std::array<char, 4>>();
       expect(std::ranges::equal(ss.str().substr(0, 4), i));
       expect(4_l == ss.tellg());
       ss.seekg(0, std::ios::beg);
     };
     "read vector of char"_test = [&buffer] {
       std::vector<char> i(4);
-      tl::read::value(buffer, i);
+      tl::read::input(buffer).output(i);
       expect(std::ranges::equal(buffer, i));
     };
     "read vector of char and shift offset"_test = [&buffer] {
       auto              span = std::span(buffer);
       std::vector<char> i(4);
-      tl::read::value(&span, i);
+      tl::read::input(&span).output(i);
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
     "safe read vector of char"_test = [&buffer] {
       std::vector<char> i(4);
-      tl::read::safe::value(buffer, i);
+      tl::read::input(buffer, true).output(i);
       expect(std::ranges::equal(buffer, i));
     };
     "safe read vector of char and shift offset"_test = [&buffer] {
       auto              span = std::span(buffer);
       std::vector<char> i(4);
-      tl::read::safe::value(&span, i);
+      tl::read::input(&span, true).output(i);
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
     "read vector of char return"_test = [&buffer] {
-      auto i = tl::read::value<std::vector<char>>(buffer, 4U);
+      auto i = tl::read::input(buffer).output(std::vector<char>(4U));
       expect(std::ranges::equal(buffer, i));
     };
     "read vector of char return and shift offset"_test = [&buffer] {
       std::span span = buffer;
-      auto      i    = tl::read::value<std::vector<char>>(&span, 4U);
+      auto      i    = tl::read::input(&span).output(std::vector<char>(4U));
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
     "read vector of char return"_test = [&buffer] {
-      auto i = tl::read::safe::value<std::vector<char>>(buffer, 4U);
+      auto i = tl::read::input(buffer).output(std::vector<char>(4U));
       expect(std::ranges::equal(buffer, i));
     };
     "read vector of char return and shift offset"_test = [&buffer] {
       std::span span = buffer;
-      auto      i    = tl::read::safe::value<std::vector<char>>(&span, 4U);
+      auto      i    = tl::read::input(&span).output(std::vector<char>(4U));
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
     "read string of char return"_test = [&buffer] {
-      auto i = tl::read::value<std::string>(buffer, 4U);
+      auto i = tl::read::input(buffer).output(std::string(4U, '\0'));
       expect(std::ranges::equal(buffer, i));
     };
     "read string of char return and shift offset"_test = [&buffer] {
       std::span span = buffer;
-      auto      i    = tl::read::value<std::string>(&span, 4U);
+      auto      i    = tl::read::input(&span).output(std::string(4U, '\0'));
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
     "read string of char return"_test = [&buffer] {
-      auto i = tl::read::safe::value<std::string>(buffer, 4U);
+      auto i = tl::read::input(buffer).output(std::string(4U, '\0'));
       expect(std::ranges::equal(buffer, i));
     };
     "read string of char return and shift offset"_test = [&buffer] {
       std::span span = buffer;
-      auto      i    = tl::read::safe::value<std::string>(&span, 4U);
+      auto      i    = tl::read::input(&span).output(std::string(4U, '\0'));
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
     "read string of char"_test = [&buffer] {
-      std::string i{};
-      i.resize(4);
-      tl::read::value(buffer, i);
+      std::string i(4U, '\0');
+      tl::read::input(buffer).output(i);
       expect(std::ranges::equal(buffer, i));
     };
     "read string of char and shift offset"_test = [&buffer] {
       auto        span = std::span(buffer);
-      std::string i{};
-      i.resize(4);
-      tl::read::value(&span, i);
+      std::string i(4U, '0');
+      tl::read::input(&span).output(i);
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
     "safe read string of char"_test = [&buffer] {
-      std::string i{};
-      i.resize(4);
-      tl::read::safe::value(buffer, i);
+      std::string i(4U, '0');
+      tl::read::input(buffer,true).output(i);
       expect(std::ranges::equal(buffer, i));
     };
     "safe read string of char and shift offset"_test = [&buffer] {
       auto        span = std::span(buffer);
-      std::string i{};
-      i.resize(4);
-      tl::read::safe::value(&span, i);
+      std::string i(4U, '0');
+      tl::read::input(&span,true).output(i);
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
