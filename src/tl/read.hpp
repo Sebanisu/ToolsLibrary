@@ -6,11 +6,14 @@
 #include <istream>
 #include <ranges>
 #include <span>
+#include <variant>
+#include "input.hpp"
 /**
  * @todo if memcpy is replaced with std::bitcast these can be constexpr. But we
  * lack compiler support right now.
  */
 namespace tl::read {
+
 /**
  * Read Value
  * @tparam outputT trivially_copyable, need to take sizeof(outputT)
