@@ -1,6 +1,6 @@
 #include <boost/ut.hpp>// single header
 // import boost.ut;        // single module (C++20)
-#include "tl/read.hpp"
+#include "tl/input.hpp"
 #include <algorithm>
 #include <sstream>
 int
@@ -218,7 +218,7 @@ int
       expect(std::ranges::equal(buffer, i));
     };
     "safe read array of char return"_test = [&buffer] {
-      auto i = tl::read::input(buffer,true).output<std::array<char, 4>>();
+      auto i = tl::read::input(buffer, true).output<std::array<char, 4>>();
       expect(std::ranges::equal(buffer, i));
     };
     "read array of char and shift offset"_test = [&buffer] {
@@ -351,13 +351,13 @@ int
     };
     "safe read string of char"_test = [&buffer] {
       std::string i(4U, '0');
-      tl::read::input(buffer,true).output(i);
+      tl::read::input(buffer, true).output(i);
       expect(std::ranges::equal(buffer, i));
     };
     "safe read string of char and shift offset"_test = [&buffer] {
       auto        span = std::span(buffer);
       std::string i(4U, '0');
-      tl::read::input(&span,true).output(i);
+      tl::read::input(&span, true).output(i);
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
