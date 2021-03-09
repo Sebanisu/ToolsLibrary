@@ -52,9 +52,7 @@ int
       std::string out{};
       auto        ret = tl::read::from_file(
         [&out](std::istream &istream) {
-          const auto bytes = tl::utility::get_remaining(istream);
-          out.resize(bytes);
-          tl::read::input(&istream,true).output(out);
+          tl::read::input(&istream,true).output_all_remaining(out);
         },
         temp_file_path.value());
       expect(ret);

@@ -1,11 +1,11 @@
 #ifndef TOOLSLIBRARY_INPUT_HPP
 #define TOOLSLIBRARY_INPUT_HPP
 #include "concepts.hpp"
+#include "utility.hpp"
 #include <cstring>
 #include <istream>
 #include <span>
 #include <variant>
-#include "utility.hpp"
 namespace tl::read {
 struct input
 {
@@ -152,15 +152,30 @@ public:
   requires(!std::is_reference_v<outvarT>) [[nodiscard]] outvarT
     output(outvarT &&outvar)
   {
-    outvarT ret(std::move(outvar)); //std::forward errors.
-    output(ret);
-    return ret;
+    output(outvar);
+    return outvar;
   }
   template<concepts::is_contiguous_and_resizable... outvarT>
   requires((sizeof...(outvarT) > 1U) && (!std::is_reference_v<outvarT> && ...))
     [[nodiscard]] std::tuple<outvarT...> output(outvarT &&...outvar)
   {
     return std::tuple<outvarT...>{ output(std::forward(outvar))... };
+  }
+  template<concepts::is_contiguous_and_resizable outvarT>
+  void
+    output_all_remaining(outvarT &outvar)
+  {
+    using value_type = std::decay_t<typename outvarT::value_type>;
+    std::size_t size = get_remaining() / sizeof(value_type);
+    outvar.resize(size);
+    output(outvar);
+  }
+  template<concepts::is_contiguous_and_resizable outvarT>
+  [[nodiscard]] outvarT
+    output_all_remaining(outvarT &&outvar)
+  {
+    output_all_remaining(outvar);
+    return outvar;
   }
 };
 }// namespace tl::read
