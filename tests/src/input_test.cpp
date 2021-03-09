@@ -362,22 +362,25 @@ int
       expect(std::ranges::equal(buffer, i));
       expect(0_ul == std::ranges::size(span));
     };
-    "output all remaining via return"_test = [&buffer]
-    {
-      const auto v = tl::read::input(buffer).template output_all_remaining(std::vector<char>());
-      expect(std::ranges::equal(buffer,v));
+    "output all remaining via return"_test = [&buffer] {
+      const auto v = tl::read::input(buffer).template output_all_remaining(
+        std::vector<char>());
+      expect(std::ranges::equal(buffer, v));
     };
-
-    "output all remaining"_test = [&buffer]
-    {
+    "output all remaining"_test = [&buffer] {
       std::vector<char> v{};
       tl::read::input(buffer).output_all_remaining(v);
-      expect(std::ranges::equal(buffer,v));
+      expect(std::ranges::equal(buffer, v));
     };
-    "output bytes via return"_test = [&buffer]
-    {
-      const auto v = tl::read::input(buffer).template output<std::vector<char>>(4);
-      expect(std::ranges::equal(buffer.substr(0,4),v));
+    "output bytes via return"_test = [&buffer] {
+      const auto v =
+        tl::read::input(buffer).template output<std::vector<char>>(4);
+      expect(std::ranges::equal(buffer.substr(0, 4), v));
+    };
+    "seek"_test = [&buffer] {
+      const auto v =
+        tl::read::input(buffer).seek(4U).template output<std::vector<char>>(4);
+      expect(std::ranges::equal(buffer.substr(4, 4), v));
     };
   };
 }

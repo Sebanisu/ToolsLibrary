@@ -188,6 +188,19 @@ public:
     output_all_remaining(outvar);
     return outvar;
   }
+  auto  seek(const size_t & bytes_size)
+  {
+    if (m_input.index() == 0) {
+      auto &in = *std::get<0>(m_input);
+      in = in.subspan(bytes_size);
+      return *this;
+    } else if (m_input.index() == 1) {
+      auto &            in = *std::get<1>(m_input);
+      in.seekg(bytes_size,std::ios::cur);
+      return *this;
+    }
+    throw;
+  }
 };
 }// namespace tl::read
 #endif// TOOLSLIBRARY_INPUT_HPP
