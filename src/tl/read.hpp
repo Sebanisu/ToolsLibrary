@@ -64,6 +64,20 @@ requires(std::invocable<lambdaT, std::istream &>)
   }
   return false;
 }
+template<concepts::is_trivially_copyable_and_default_constructible outputT,
+         typename lambdaT>
+requires(std::invocable<lambdaT, std::istream &>)
+  [[maybe_unused]] static outputT
+  from_file(const std::size_t &offset, const std::filesystem::path &path)
+{
+  outputT output{};
+  tl::read::from_file(
+    [&offset, &output](std::istream &istream) {
+      tl::read::input(&istream).seek(offset).output(output);
+    },
+    path);
+  return output;
+}
 template<concepts::is_contiguous_and_resizable out_rangeT>
 out_rangeT
   entire_file(std::filesystem::path in_path, out_rangeT &&out)
