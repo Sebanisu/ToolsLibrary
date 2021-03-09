@@ -32,6 +32,7 @@ int
     const auto temp_file_path = create_temp_file();
     "create temp file"_test   = [&temp_file_path] {
       expect(temp_file_path.has_value());
+      expect(std::filesystem::exists(temp_file_path.value()));
     };
     "open file"_test = [&temp_file_path] {
       auto fp = tl::read::open_file(temp_file_path.value());
