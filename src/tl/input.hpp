@@ -177,6 +177,17 @@ public:
     output_all_remaining(outvar);
     return outvar;
   }
+  template<concepts::is_contiguous_and_resizable outvarT>
+  [[nodiscard]] outvarT
+  output(const size_t bytes_size)
+  {
+    outvarT outvar{};
+    using value_type = std::decay_t<typename outvarT::value_type>;
+    std::size_t size = bytes_size / sizeof(value_type);
+    outvar.resize(size);
+    output_all_remaining(outvar);
+    return outvar;
+  }
 };
 }// namespace tl::read
 #endif// TOOLSLIBRARY_INPUT_HPP
