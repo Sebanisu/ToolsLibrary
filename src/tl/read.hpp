@@ -64,9 +64,7 @@ requires(std::invocable<lambdaT, std::istream &>)
   }
   return false;
 }
-template<concepts::is_trivially_copyable_and_default_constructible outputT,
-         typename lambdaT>
-requires(std::invocable<lambdaT, std::istream &>)
+template<concepts::is_trivially_copyable_and_default_constructible outputT>
   [[maybe_unused]] static outputT
   from_file(const std::size_t &offset, const std::filesystem::path &path)
 {

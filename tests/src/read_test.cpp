@@ -62,6 +62,12 @@ int
       const auto out = tl::read::entire_file(temp_file_path.value(),std::string());
       expect(std::ranges::equal(out,"Hello World"s));
     };
-
+    "read value from file at offset"_test = [&temp_file_path]
+    {
+      const auto out = tl::read::from_file<char>(3U,temp_file_path.value());
+      const auto out2 = tl::read::from_file<char>(2U,temp_file_path.value());
+      expect(out == 'l');
+      expect(out2 == 'l');
+    };
   };
 }
