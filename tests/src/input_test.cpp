@@ -368,13 +368,13 @@ int
       expect(std::ranges::equal(buffer,v));
     };
 
-    "output all remaining via return"_test = [&buffer]
+    "output all remaining"_test = [&buffer]
     {
       std::vector<char> v{};
       tl::read::input(buffer).output_all_remaining(v);
       expect(std::ranges::equal(buffer,v));
     };
-    "output all remaining via return"_test = [&buffer]
+    "output bytes via return"_test = [&buffer]
     {
       const auto v = tl::read::input(buffer).template output<std::vector<char>>(4);
       expect(std::ranges::equal(buffer.substr(0,4),v));
