@@ -196,7 +196,7 @@ public:
       return *this;
     } else if (m_input.index() == 1) {
       auto &            in = *std::get<1>(m_input);
-      in.seekg(bytes_size,std::ios::cur);
+      in.seekg(static_cast<long>(bytes_size),std::ios::cur);
       return *this;
     }
     throw;
