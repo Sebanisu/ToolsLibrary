@@ -3,9 +3,10 @@
 //
 #ifndef TOOLSLIBRARY_READ_HPP
 #define TOOLSLIBRARY_READ_HPP
-#include <optional>
+#include "input.hpp"
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <thread>
 namespace tl::read {
 /**
@@ -52,8 +53,8 @@ static std::optional<std::ifstream>
  */
 template<typename lambdaT>
 requires(std::invocable<lambdaT, std::istream &>)
-[[maybe_unused]] static bool from_file(const lambdaT &lambda,
-                                            const std::filesystem::path &path)
+  [[maybe_unused]] static bool from_file(const lambdaT &              lambda,
+                                         const std::filesystem::path &path)
 {
   auto ofp = open_file(path);
   if (ofp.has_value() && ofp->is_open()) {// check might be redundant.
@@ -63,5 +64,16 @@ requires(std::invocable<lambdaT, std::istream &>)
   }
   return false;
 }
+template<concepts::is_contiguous_and_resizable out_rangeT>
+out_rangeT
+  entire_file(std::filesystem::path in_path, out_rangeT &&out)
+{
+  from_file(
+    [&out](std::istream &istream) {
+      tl::read::input(&istream, true).output_all_remaining(out);
+    },
+    in_path);
+  return out;
 }
+}// namespace tl::read
 #endif// TOOLSLIBRARY_READ_HPP
