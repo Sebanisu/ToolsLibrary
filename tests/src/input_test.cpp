@@ -1,6 +1,7 @@
 #include <boost/ut.hpp>// single header
 // import boost.ut;        // single module (C++20)
 #include "tl/input.hpp"
+#include "tl/read.hpp"
 #include <algorithm>
 #include <sstream>
 int
@@ -9,7 +10,7 @@ int
   using namespace boost::ut::literals;
   using namespace boost::ut::operators::terse;
   using namespace boost::ut;
-  [[maybe_unused]] suite read = [] {
+  [[maybe_unused]] suite input = [] {
     constexpr auto buffer = std::string_view("\x01\x00\x00\x00", 4U);
     constexpr auto longer_buffer =
       std::string_view("\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00", 12U);

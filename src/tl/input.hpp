@@ -5,6 +5,7 @@
 #include <istream>
 #include <span>
 #include <variant>
+#include "utility.hpp"
 namespace tl::read {
 struct input
 {
@@ -69,14 +70,9 @@ private:
     get_remaining()
   {
     if (m_input.index() == 0) {
-      return std::ranges::size(*std::get<0>(m_input));
+      return tl::utility::get_remaining(*std::get<0>(m_input));
     } else if (m_input.index() == 1) {
-      std::istream &in      = *std::get<1>(m_input);
-      const auto    current = in.tellg();
-      in.seekg(0, std::ios::end);
-      const auto end = in.tellg();
-      in.seekg(current, std::ios::beg);
-      return static_cast<std::size_t>(end - current);
+      return tl::utility::get_remaining(*std::get<1>(m_input));
     }
     throw;
   }
