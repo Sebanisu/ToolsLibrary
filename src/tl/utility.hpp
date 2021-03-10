@@ -5,7 +5,7 @@
 #include <span>
 namespace tl::utility {
 static auto
-  get_remaining(const std::span<const char> &in)
+  get_remaining(const std::span<const char> in)
 {
   return std::ranges::size(in);
 }

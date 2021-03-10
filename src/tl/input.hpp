@@ -2,6 +2,7 @@
 #define TOOLSLIBRARY_INPUT_HPP
 #include "concepts.hpp"
 #include "utility.hpp"
+#include <cassert>
 #include <cstring>
 #include <istream>
 #include <span>
@@ -19,6 +20,10 @@ private:
    */
   std::span<const char> m_tmp_span{};
   /**
+   * Used for seeking with spans. If we are seeking from begin.
+   */
+  decltype(std::ranges::data(m_tmp_span)) m_tmp_span_data{};
+  /**
    * Pointer to a span of char or pointer to an istream. So we can read from
    * char buffers or files. I'm using pointers here because references can't be
    * stored in a variant.
@@ -29,24 +34,20 @@ private:
    * we read.
    */
   bool m_safe{ false };
-  //  bool
-  //    execute(const auto &lambda)
-  //  {
-  //    switch (m_input.index()) {
-  //    case 0:
-  //      return lambda(std::get<0>(m_input));
-  //    case 1:
-  //      return lambda(*std::get<1>(m_input));
-  //    case 3:
-  //      return lambda(*std::get<2>(m_input));
-  //    }
-  //  }
+  /**
+   * memcpy data from in to outvar
+   * @param outvar dest
+   * @param in src
+   * @param bytes number of bytes
+   */
   template<concepts::is_trivially_copyable outvarT>
   void
     copy(outvarT *const                 outvar,
          const std::ranges::range auto &in,
          const std::size_t              bytes = sizeof(outvarT)) const
   {
+    assert(outvar != nullptr);
+    assert(std::ranges::data(in) != nullptr);
     memcpy(outvar, std::ranges::data(in), bytes);
   }
   template<concepts::is_trivially_copyable outvarT>
@@ -76,12 +77,18 @@ private:
     }
     throw;
   }
+
 public:
-  explicit input(std::span<const char> in_input, bool in_safe = false)
-    : m_tmp_span(in_input), m_input(&m_tmp_span), m_safe(in_safe)
-  {}
   explicit input(std::span<const char> *const in_input, bool in_safe = false)
-    : m_input(in_input), m_safe(in_safe)
+    : m_tmp_span_data(std::ranges::data(*in_input)),
+      m_input(in_input),
+      m_safe(in_safe)
+  {}
+  explicit input(std::span<const char> in_input, bool in_safe = false)
+    : m_tmp_span(in_input),
+      m_tmp_span_data(std::ranges::data(m_tmp_span)),
+      m_input(&m_tmp_span),
+      m_safe(in_safe)
   {}
   explicit input(std::istream *in_input, bool in_safe = false)
     : m_input(in_input), m_safe(in_safe)
@@ -179,24 +186,49 @@ public:
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   [[nodiscard]] outvarT
-  output(const size_t bytes_size)
+    output(const size_t bytes_size)
   {
     outvarT outvar{};
     using value_type = std::decay_t<typename outvarT::value_type>;
     std::size_t size = bytes_size / sizeof(value_type);
     outvar.resize(size);
-    output_all_remaining(outvar);
+    [[maybe_unused]] const auto rem = get_remaining();
+    output(outvar);
     return outvar;
   }
-  auto  seek(const size_t & bytes_size)
+  auto &
+    seek(const size_t &bytes_size, decltype(std::ios::cur) from)
   {
+    assert(m_tmp_span_data != nullptr);
     if (m_input.index() == 0) {
-      auto &in = *std::get<0>(m_input);
-      in = in.subspan(bytes_size);
+      auto &     in    = *std::get<0>(m_input);
+      const auto reset = [&in, this]() {
+        const auto offset =
+          std::distance(m_tmp_span_data, std::ranges::data(in));
+        if (offset > 0U) {
+          const auto size = offset + std::ranges::size(in);
+          in              = std::span<const char>(m_tmp_span_data, size);
+        }
+      };
+      if (from == std::ios::beg) {
+        reset();
+        assert(std::ranges::size(in) >= bytes_size);
+        in = in.subspan(bytes_size);
+      } else if (from == std::ios::cur) {
+        assert(std::ranges::size(in) >= bytes_size);
+        in = in.subspan(bytes_size);
+      } else if (from == std::ios::end) {
+        reset();
+        assert(std::ranges::size(in) >= bytes_size);
+        const auto seek_v = std::ranges::size(in) - bytes_size;
+        in                = in.subspan(seek_v);
+      } else {
+        throw;
+      }
       return *this;
     } else if (m_input.index() == 1) {
-      auto &            in = *std::get<1>(m_input);
-      in.seekg(static_cast<long>(bytes_size),std::ios::cur);
+      auto &in = *std::get<1>(m_input);
+      in.seekg(static_cast<long>(bytes_size), from);
       return *this;
     }
     throw;

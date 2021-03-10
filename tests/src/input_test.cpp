@@ -374,13 +374,28 @@ int
     };
     "output bytes via return"_test = [] {
       const auto v =
-        tl::read::input(buffer).template output<std::vector<char>>(4);
+        tl::read::input(longer_buffer).template output<std::vector<char>>(4);
       expect(std::ranges::equal(buffer.substr(0, 4), v));
     };
     "seek"_test = [] {
-      const auto v =
-        tl::read::input(buffer).seek(4U).template output<std::vector<char>>(4);
-      expect(std::ranges::equal(buffer.substr(4, 4), v));
+      const auto v = tl::read::input(longer_buffer)
+                       .seek(4U, std::ios::cur)
+                       .template output<std::vector<char>>(4);
+      expect(std::ranges::equal(longer_buffer.substr(4, 4), v));
+    };
+    "seek from end"_test = [] {
+      auto input = tl::read::input(longer_buffer);
+      input.seek(4U, std::ios::end);
+      const auto v = input.template output<std::vector<char>>(4);
+      const auto substr = longer_buffer.substr(8,4);
+      expect(std::ranges::equal(substr, v));
+    };
+    "seek from begin"_test = [] {
+      auto input = tl::read::input(longer_buffer);
+      input.seek(6U, std::ios::beg);
+      const auto v = input.template output<std::vector<char>>(4);
+      const auto substr = longer_buffer.substr(6,4);
+      expect(std::ranges::equal(substr, v));
     };
   };
 }

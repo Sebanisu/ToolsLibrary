@@ -71,7 +71,7 @@ template<concepts::is_trivially_copyable_and_default_constructible outputT>
   outputT output{};
   tl::read::from_file(
     [&offset, &output](std::istream &istream) {
-      tl::read::input(&istream).seek(offset).output(output);
+      tl::read::input(&istream).seek(offset,std::ios::beg).output(output);
     },
     path);
   return output;
