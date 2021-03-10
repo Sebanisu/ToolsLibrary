@@ -66,7 +66,7 @@ requires(std::invocable<lambdaT, std::istream &>)
 }
 template<concepts::is_trivially_copyable_and_default_constructible outputT>
   [[maybe_unused]] static outputT
-  from_file(const std::size_t &offset, const std::filesystem::path &path)
+  from_file(const long &offset, const std::filesystem::path &path)
 {
   outputT output{};
   tl::read::from_file(

@@ -113,7 +113,7 @@ private:
         throw_if_seek_out_of_range(bytes_size);
         in = in.subspan(static_cast<std::size_t>(bytes_size));
       } else if (bytes_size < 0) {
-        const auto offset =
+        const long offset =
           std::distance(m_tmp_span_data, std::ranges::data(in)) + bytes_size;
         return seek(offset, std::ios::beg);
       }
