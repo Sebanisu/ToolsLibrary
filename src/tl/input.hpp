@@ -133,7 +133,7 @@ private:
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   void
-    output_span(const outvarT &outvar, size_t size)
+    output_span(outvarT &outvar, size_t size)
   {
     auto &in = *std::get<0>(m_input);
     copy(std::ranges::data(outvar), in, size);
@@ -141,7 +141,7 @@ private:
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   void
-    output_istream(const outvarT &outvar, size_t size)
+    output_istream(outvarT &outvar, size_t size)
   {
     auto &            in = *std::get<1>(m_input);
     std::vector<char> tmp(size);
@@ -262,7 +262,7 @@ public:
     return outvar;
   }
   input &
-    seek(const long &bytes_size, decltype(std::ios::cur) from)
+    seek(const long &bytes_size, const std::ios_base::seekdir &from)
   {
     if (bytes_size == 0 && from == std::ios::cur) {
       return *this;
