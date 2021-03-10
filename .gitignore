@@ -26,6 +26,10 @@
 *.a
 *.lib
 
+#visual studio
+.vs/*
+out/*
+
 # Executables
 *.exe
 *.out
