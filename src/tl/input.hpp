@@ -77,7 +77,77 @@ private:
     }
     throw;
   }
-
+  void
+    throw_if_seek_out_of_range(const size_t &bytes_size)
+  {
+    if (m_safe && get_remaining() < bytes_size) {
+      throw;
+    }
+  }
+  input &
+    seek_span(const long &bytes_size, const std::ios_base::seekdir &from)
+  {
+    assert(m_tmp_span_data != nullptr);
+    auto &     in    = *std::get<0>(m_input);
+    const auto reset = [&in, this]() {
+      const auto offset = static_cast<std::size_t>(
+        std::distance(m_tmp_span_data, std::ranges::data(in)));
+      if (offset > 0U) {
+        const auto size = offset + std::ranges::size(in);
+        in              = std::span<const char>(m_tmp_span_data, size);
+      }
+    };
+    if (from == std::ios::beg) {
+      assert(bytes_size >= 0);
+      reset();
+      throw_if_seek_out_of_range(bytes_size);
+      in = in.subspan(bytes_size);
+    } else if (from == std::ios::cur) {
+      if (bytes_size > 0) {
+        throw_if_seek_out_of_range(bytes_size);
+        in = in.subspan(bytes_size);
+      } else if (bytes_size < 0) {
+        const auto offset =
+          std::distance(m_tmp_span_data, std::ranges::data(in)) + bytes_size;
+        return seek(offset, std::ios::beg);
+      }
+    } else if (from == std::ios::end) {
+      assert(bytes_size < 0);
+      reset();
+      throw_if_seek_out_of_range(bytes_size);
+      const std::size_t seek_v = std::ranges::size(in) - std::abs(bytes_size);
+      in                       = in.subspan(seek_v);
+    } else {
+      throw;
+    }
+    return *this;
+  }
+  input &
+    seek_istream(const long &bytes_size, const std::ios_base::seekdir &from)
+  {
+    auto &in = *std::get<1>(m_input);
+    assert(!((from == std::ios::end && bytes_size > 0)
+             || (from == std::ios::beg && bytes_size < 0)));
+    in.seekg(bytes_size, from);
+    return *this;
+  }
+  template<concepts::is_contiguous_and_resizable outvarT>
+  void
+    output_span(const outvarT &outvar, size_t size)
+  {
+    auto &in = *std::get<0>(m_input);
+    copy(std::ranges::data(outvar), in, size);
+    in = in.subspan(size);
+  }
+  template<concepts::is_contiguous_and_resizable outvarT>
+  void
+    output_istream(const outvarT &outvar, size_t size)
+  {
+    auto &            in = *std::get<1>(m_input);
+    std::vector<char> tmp(size);
+    in.read(std::ranges::data(tmp), size);
+    copy(std::ranges::data(outvar), tmp, size);
+  }
 public:
   explicit input(std::span<const char> *const in_input, bool in_safe = false)
     : m_tmp_span_data(std::ranges::data(*in_input)),
@@ -137,15 +207,10 @@ public:
       return;
     }
     if (m_input.index() == 0) {
-      auto &in = *std::get<0>(m_input);
-      copy(std::ranges::data(outvar), in, size);
-      in = in.subspan(size);
+      output_span(outvar, size);
       return;
     } else if (m_input.index() == 1) {
-      auto &            in = *std::get<1>(m_input);
-      std::vector<char> tmp(size);
-      in.read(std::ranges::data(tmp), sizeof(outvar));
-      copy(std::ranges::data(outvar), tmp, size);
+      output_istream(outvar, size);
       return;
     }
     throw;
@@ -192,44 +257,20 @@ public:
     using value_type = std::decay_t<typename outvarT::value_type>;
     std::size_t size = bytes_size / sizeof(value_type);
     outvar.resize(size);
-    [[maybe_unused]] const auto rem = get_remaining();
+    // [[maybe_unused]] const auto rem = get_remaining();
     output(outvar);
     return outvar;
   }
-  auto &
-    seek(const size_t &bytes_size, decltype(std::ios::cur) from)
+  input &
+    seek(const long &bytes_size, decltype(std::ios::cur) from)
   {
-    assert(m_tmp_span_data != nullptr);
+    if (bytes_size == 0 && from == std::ios::cur) {
+      return *this;
+    }
     if (m_input.index() == 0) {
-      auto &     in    = *std::get<0>(m_input);
-      const auto reset = [&in, this]() {
-        const auto offset =
-          static_cast<std::size_t>(std::distance(m_tmp_span_data, std::ranges::data(in)));
-        if (offset > 0U) {
-          const auto size = offset + std::ranges::size(in);
-          in              = std::span<const char>(m_tmp_span_data, size);
-        }
-      };
-      if (from == std::ios::beg) {
-        reset();
-        assert(std::ranges::size(in) >= bytes_size);
-        in = in.subspan(bytes_size);
-      } else if (from == std::ios::cur) {
-        assert(std::ranges::size(in) >= bytes_size);
-        in = in.subspan(bytes_size);
-      } else if (from == std::ios::end) {
-        reset();
-        assert(std::ranges::size(in) >= bytes_size);
-        const auto seek_v = std::ranges::size(in) - bytes_size;
-        in                = in.subspan(seek_v);
-      } else {
-        throw;
-      }
-      return *this;
+      return seek_span(bytes_size, from);
     } else if (m_input.index() == 1) {
-      auto &in = *std::get<1>(m_input);
-      in.seekg(static_cast<long>(bytes_size), from);
-      return *this;
+      return seek_istream(bytes_size, from);
     }
     throw;
   }

@@ -385,17 +385,50 @@ int
     };
     "seek from end"_test = [] {
       auto input = tl::read::input(longer_buffer);
-      input.seek(4U, std::ios::end);
-      const auto v = input.template output<std::vector<char>>(4);
-      const auto substr = longer_buffer.substr(8,4);
+      input.seek(-4, std::ios::end);
+      const auto v      = input.template output<std::vector<char>>(4);
+      const auto substr = longer_buffer.substr(8, 4);
       expect(std::ranges::equal(substr, v));
     };
     "seek from begin"_test = [] {
       auto input = tl::read::input(longer_buffer);
-      input.seek(6U, std::ios::beg);
-      const auto v = input.template output<std::vector<char>>(4);
-      const auto substr = longer_buffer.substr(6,4);
+      input.seek(6, std::ios::beg);
+      const auto v      = input.template output<std::vector<char>>(4);
+      const auto substr = longer_buffer.substr(6, 4);
       expect(std::ranges::equal(substr, v));
+    };
+    "seek using ss"_test = [&ss] {
+      auto input = tl::read::input(&ss);
+      input.seek(4, std::ios::cur);
+      expect(ss.tellg() == 4_l);
+      const auto v = input.template output<std::vector<char>>(4);
+      ss.seekg(0, std::ios::beg);
+      expect(ss.tellg() == 0_l);
+      expect(std::ranges::equal(longer_buffer.substr(4, 4), v));
+    };
+    "seek from begin using ss"_test = [&ss] {
+      auto input = tl::read::input(&ss);
+      expect(ss.tellg() == 0_l);
+      input.seek(6, std::ios::beg);
+      //ss.seekg(6U,std::ios::beg);
+      expect(ss.tellg() == 6_l);
+      const auto v      = input.template output<std::vector<char>>(4);
+      const auto substr = longer_buffer.substr(6, 4);
+      expect(std::ranges::equal(substr, v));
+      ss.seekg(0, std::ios::beg);
+      expect(ss.tellg() == 0_l);
+    };
+    "seek from end using ss"_test = [&ss] {
+      auto input = tl::read::input(&ss);
+      expect(ss.tellg() == 0_l);
+      input.seek(-4, std::ios::end);
+      //ss.seekg(4,std::ios::end);
+      expect(ss.tellg() == 8_l);
+      const auto v      = input.template output<std::vector<char>>(4);
+      const auto substr = longer_buffer.substr(8, 4);
+      expect(std::ranges::equal(substr, v));
+      ss.seekg(0, std::ios::beg);
+      expect(ss.tellg() == 0_l);
     };
   };
 }
