@@ -204,7 +204,7 @@ public:
       auto &     in    = *std::get<0>(m_input);
       const auto reset = [&in, this]() {
         const auto offset =
-          std::distance(m_tmp_span_data, std::ranges::data(in));
+          static_cast<std::size_t>(std::distance(m_tmp_span_data, std::ranges::data(in)));
         if (offset > 0U) {
           const auto size = offset + std::ranges::size(in);
           in              = std::span<const char>(m_tmp_span_data, size);
