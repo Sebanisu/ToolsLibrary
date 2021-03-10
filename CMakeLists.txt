@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.18)
 project(ToolsLibrary C CXX)
 
 set(CMAKE_CXX_STANDARD 20) ## Supported values are 98, 11, 14, 17, and 20.
