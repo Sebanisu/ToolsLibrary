@@ -78,9 +78,15 @@ private:
     throw;
   }
   void
-    throw_if_seek_out_of_range(const size_t &bytes_size)
+    throw_if_seek_out_of_range(const long &bytes_size)
   {
-    if (m_safe && get_remaining() < bytes_size) {
+    if (m_safe
+        && ((bytes_size > 0)
+            && (get_remaining() < static_cast<std::size_t>(bytes_size)))
+        && ((bytes_size < 0)
+            && (std::distance(m_tmp_span_data,
+                              std::ranges::data(*std::get<0>(m_input))))
+                 < std::abs(bytes_size))) {
       throw;
     }
   }
@@ -101,11 +107,11 @@ private:
       assert(bytes_size >= 0);
       reset();
       throw_if_seek_out_of_range(bytes_size);
-      in = in.subspan(bytes_size);
+      in = in.subspan(static_cast<std::size_t>(bytes_size));
     } else if (from == std::ios::cur) {
       if (bytes_size > 0) {
         throw_if_seek_out_of_range(bytes_size);
-        in = in.subspan(bytes_size);
+        in = in.subspan(static_cast<std::size_t>(bytes_size));
       } else if (bytes_size < 0) {
         const auto offset =
           std::distance(m_tmp_span_data, std::ranges::data(in)) + bytes_size;
@@ -115,8 +121,9 @@ private:
       assert(bytes_size < 0);
       reset();
       throw_if_seek_out_of_range(bytes_size);
-      const std::size_t seek_v = std::ranges::size(in) - std::abs(bytes_size);
-      in                       = in.subspan(seek_v);
+      const std::size_t seek_v =
+        std::ranges::size(in) - static_cast<std::size_t>(std::abs(bytes_size));
+      in = in.subspan(seek_v);
     } else {
       throw;
     }
@@ -145,9 +152,10 @@ private:
   {
     auto &            in = *std::get<1>(m_input);
     std::vector<char> tmp(size);
-    in.read(std::ranges::data(tmp), size);
+    in.read(std::ranges::data(tmp), static_cast<long>(size));
     copy(std::ranges::data(outvar), tmp, size);
   }
+
 public:
   explicit input(std::span<const char> *const in_input, bool in_safe = false)
     : m_tmp_span_data(std::ranges::data(*in_input)),
