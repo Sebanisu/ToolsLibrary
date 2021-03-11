@@ -14,7 +14,7 @@ static std::optional<std::filesystem::path>
   auto fp = std::fstream(out_path, std::ios::binary | std::ios::out);
   if (fp.is_open()) {
     const auto write = [&fp](const std::string_view &buffer) {
-      fp.write(std::data(buffer), std::size(buffer));
+      fp.write(std::data(buffer), static_cast<long>(std::size(buffer)));
     };
     write("Hello World"sv);
   }
