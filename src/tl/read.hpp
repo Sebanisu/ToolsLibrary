@@ -86,7 +86,7 @@ out_rangeT
       tl::read::input(&istream, true).output_all_remaining(out);
     },
     in_path);
-  return out;
+  return std::move(out); //-Wreturn-std-move
 }
 }// namespace tl::read
 #endif// TOOLSLIBRARY_READ_HPP
