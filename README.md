@@ -17,8 +17,7 @@ I'm mirroring what <a href="https://github.com/codereport/An-Algorithm-Library">
 My tests are wrote using [ut](https://github.com/boost-ext/ut). This is a neat library. It doesn't require the use of macros.
 
 1. `tl/input.hpp`
-    * This struct takes a std::span, or a std::istream. This lets you output to a trivial types, or contiguous ranges of
-      trivial types.
+    * This struct wraps around a `std::span`, or a `std::istream`. This lets you output to a trivial types, or contiguous ranges of trivial types.
 2. `tl/read.hpp`
     * This file contains free functions that use `input` to read from files.
 3. `tl/concepts.hpp`
