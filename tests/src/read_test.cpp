@@ -9,16 +9,7 @@ static std::optional<std::filesystem::path>
   create_temp_file()
 {
   using namespace std::string_view_literals;
-  std::filesystem::path out_path =
-    std::filesystem::temp_directory_path() / "ToolsLibrary_read_test.tmp";
-  auto fp = std::fstream(out_path, std::ios::binary | std::ios::out);
-  if (fp.is_open()) {
-    const auto write = [&fp](const std::string_view &buffer) {
-      fp.write(std::data(buffer), static_cast<long>(std::size(buffer)));
-    };
-    write("Hello World"sv);
-  }
-  return out_path;
+  return tl::utility::create_temp_file("ToolsLibrary_read_test.tmp","Hello World"sv);
 }
 int
   main()

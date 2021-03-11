@@ -5,13 +5,14 @@
 #include <span>
 #include <filesystem>
 #include <fstream>
+#include <optional>
 namespace tl::utility {
-static auto
+[[nodiscard]] static auto
   get_remaining(const std::span<const char> in)
 {
   return std::ranges::size(in);
 }
-static auto
+[[nodiscard]] static auto
   get_remaining(std::istream &in)
 {
   const auto current = in.tellg();
@@ -20,7 +21,7 @@ static auto
   in.seekg(current, std::ios::beg);
   return static_cast<std::size_t>(end - current);
 }
-static std::optional<std::filesystem::path>
+[[maybe_unused]] [[nodiscard]] static std::optional<std::filesystem::path>
 create_temp_file(const std::filesystem::path & file_name, const std::string_view & data)
 {
   using namespace std::string_view_literals;

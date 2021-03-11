@@ -6,9 +6,9 @@
 #include "tl/input.hpp"
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <optional>
 #include <thread>
-#include <iostream>
 namespace tl::read {
 /**
  * Opens file pointer and returns an optional.
@@ -16,7 +16,7 @@ namespace tl::read {
  * @return
  * @todo test?
  */
-static std::optional<std::ifstream>
+[[nodiscard]] static std::optional<std::ifstream>
   open_file(const std::filesystem::path &path)
 {
   std::optional<std::ifstream> ofp{};
@@ -54,8 +54,8 @@ static std::optional<std::ifstream>
  */
 template<typename lambdaT>
 requires(std::invocable<lambdaT, std::istream &>)
-  [[maybe_unused]] static bool from_file(const lambdaT &              lambda,
-                                         const std::filesystem::path &path)
+  [[maybe_unused]] static bool from_file(
+    const lambdaT &lambda, const std::filesystem::path &path)
 {
   auto ofp = open_file(path);
   if (ofp.has_value() && ofp->is_open()) {// check might be redundant.
@@ -66,19 +66,19 @@ requires(std::invocable<lambdaT, std::istream &>)
   return false;
 }
 template<concepts::is_trivially_copyable_and_default_constructible outputT>
-  [[maybe_unused]] static outputT
+[[maybe_unused]] [[nodiscard]] static outputT
   from_file(const long &offset, const std::filesystem::path &path)
 {
   outputT output{};
   tl::read::from_file(
     [&offset, &output](std::istream &istream) {
-      tl::read::input(&istream).seek(offset,std::ios::beg).output(output);
+      tl::read::input(&istream).seek(offset, std::ios::beg).output(output);
     },
     path);
   return output;
 }
 template<concepts::is_contiguous_and_resizable out_rangeT>
-out_rangeT
+[[nodiscard]] out_rangeT
   entire_file(std::filesystem::path in_path, out_rangeT &&out)
 {
   from_file(
@@ -86,7 +86,7 @@ out_rangeT
       tl::read::input(&istream, true).output_all_remaining(out);
     },
     in_path);
-  return std::move(out); //-Wreturn-std-move
+  return std::move(out);//-Wreturn-std-move
 }
 }// namespace tl::read
 #endif// TOOLSLIBRARY_READ_HPP
