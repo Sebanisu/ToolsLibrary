@@ -1,15 +1,13 @@
-#include <boost/ut.hpp>// single header
+#include "boost/ut.hpp"// single header
 // import boost.ut;        // single module (C++20)
 #include "tl/input.hpp"
-#include "tl/read.hpp"
+#include <ranges>
 #include <algorithm>
-#include <sstream>
-int
-  main()
+int main()
 {
-  using namespace boost::ut::literals;
-  using namespace boost::ut::operators::terse;
-  using namespace boost::ut;
+    using namespace boost::ut::literals;
+    using namespace boost::ut::operators::terse;
+    using namespace boost::ut;
   [[maybe_unused]] suite input = [] {
     static constexpr auto buffer = std::string_view("\x01\x00\x00\x00", 4U);
     static constexpr auto longer_buffer =
@@ -130,20 +128,24 @@ int
     };
     "read ints and return it and shift offset"_test = [] {
       auto span = std::span(longer_buffer);
-      const auto [i, i2, i3] =
-        tl::read::input(&span)
-          .output<std::int32_t, std::int32_t, std::int32_t>();
-      expect(1_i == i);
+      const auto tuple = tl::read::input(&span).template output<std::int32_t, std::int32_t, std::int32_t>();
+      const int i1 = std::get<0>(tuple);
+      const int i2 = std::get<1>(tuple);
+      const int i3 = std::get<2>(tuple);
+      expect(1_i == i1);
       expect(2_i == i2);
       expect(3_i == i3);
       expect(0_ul == std::ranges::size(span));
     };
     "read ints and return it and don't shift offset"_test = [] {
       auto span = std::span(longer_buffer);
-      const auto [i, i2, i3] =
+      const auto tuple =
         tl::read::input(span)
-          .output<std::int32_t, std::int32_t, std::int32_t>();
-      expect(1_i == i);
+          .template output<std::int32_t, std::int32_t, std::int32_t>();
+      const int i1 = std::get<0>(tuple);
+      const int i2 = std::get<1>(tuple);
+      const int i3 = std::get<2>(tuple);
+      expect(1_i == i1);
       expect(2_i == i2);
       expect(3_i == i3);
       expect(12_ul == std::ranges::size(span));
@@ -163,10 +165,14 @@ int
     "safe read ints and return it and don't shift offset, expect one to not be wrote to."_test =
       [] {
         auto span = std::span(longer_buffer);
-        const auto [i, i2, i3, i4] =
+        const auto tuple =
           tl::read::input(span, true)
             .output<std::int32_t, std::int32_t, std::int32_t, std::int32_t>();
-        expect(1_i == i);
+        const int i1 = std::get<0>(tuple);
+        const int i2 = std::get<1>(tuple);
+        const int i3 = std::get<2>(tuple);
+        const int i4 = std::get<3>(tuple);
+        expect(1_i == i1);
         expect(2_i == i2);
         expect(3_i == i3);
         expect(0_i == i4);
@@ -175,29 +181,40 @@ int
     "safe read ints and return it and shift offset, expect one to not be wrote to."_test =
       [] {
         auto span = std::span(longer_buffer);
-        const auto [i, i2, i3, i4] =
+        const auto tuple =
           tl::read::input(&span, true)
             .output<std::int32_t, std::int32_t, std::int32_t, std::int32_t>();
-        expect(1_i == i);
+        const int i1 = std::get<0>(tuple);
+        const int i2 = std::get<1>(tuple);
+        const int i3 = std::get<2>(tuple);
+        const int i4 = std::get<3>(tuple);
+        expect(1_i == i1);
         expect(2_i == i2);
         expect(3_i == i3);
         expect(0_i == i4);
         expect(0_ul == std::ranges::size(span));
       };
     "read ints from stream"_test = [&ss] {
-      const auto [i, i2, i3] =
+      const auto tuple =
         tl::read::input(&ss).output<std::int32_t, std::int32_t, std::int32_t>();
-      expect(1_i == i);
+      const int i1 = std::get<0>(tuple);
+      const int i2 = std::get<1>(tuple);
+      const int i3 = std::get<2>(tuple);
+      expect(1_i == i1);
       expect(2_i == i2);
       expect(3_i == i3);
       expect(12_l == ss.tellg());
       ss.seekg(0, std::ios::beg);
     };
     "safe read ints from stream"_test = [&ss] {
-      const auto [i, i2, i3, i4] =
+      const auto tuple =
         tl::read::input(&ss, true)
           .output<std::int32_t, std::int32_t, std::int32_t, std::int32_t>();
-      expect(1_i == i);
+      const int i1 = std::get<0>(tuple);
+      const int i2 = std::get<1>(tuple);
+      const int i3 = std::get<2>(tuple);
+      const int i4 = std::get<3>(tuple);
+      expect(1_i == i1);
       expect(2_i == i2);
       expect(3_i == i3);
       expect(0_i == i4);
@@ -363,7 +380,7 @@ int
       expect(0_ul == std::ranges::size(span));
     };
     "output all remaining via return"_test = [] {
-      const auto v = tl::read::input(buffer).template output_all_remaining(
+      const auto v = tl::read::input(buffer).output_all_remaining(
         std::vector<char>());
       expect(std::ranges::equal(buffer, v));
     };
@@ -379,7 +396,7 @@ int
     };
     "seek"_test = [] {
       const auto v = tl::read::input(longer_buffer)
-                       .seek(4U, std::ios::cur)
+                       .seek(4, std::ios::cur)
                        .template output<std::vector<char>>(4);
       expect(std::ranges::equal(longer_buffer.substr(4, 4), v));
     };
