@@ -237,7 +237,7 @@ public:
     output(outvarT &&outvar)
   {
     output(outvar);
-    return outvar;
+    return std::move(outvar);
   }
   template<concepts::is_contiguous_and_resizable... outvarT>
   requires((sizeof...(outvarT) > 1U) && (!std::is_reference_v<outvarT> && ...))
@@ -259,7 +259,7 @@ public:
     output_all_remaining(outvarT &&outvar)
   {
     output_all_remaining(outvar);
-    return outvar;
+    return std::move(outvar);
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   [[nodiscard]] outvarT
