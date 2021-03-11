@@ -12,7 +12,7 @@
     <a href="https://GitHub.com/sebanisu/ToolsLibrary/stargazers/" alt="GitHub stars">
         <img src="https://img.shields.io/github/stars/sebanisu/ToolsLibrary.svg?style=social&label=Star" /></a>
 </p>
-I'm mirroring what [codereport](https://github.com/codereport/An-Algorithm-Library) is doing. I will be using this code in my other projects. I'm putting it into an open source library that everyone can use.
+I'm mirroring what <a href="https://github.com/codereport/An-Algorithm-Library">codereport</a> is doing. I will be using this code in my other projects. I'm putting it into an open source library that anyone can use.
 
 My tests are wrote using [ut](https://github.com/boost-ext/ut). This is a neat library. It doesn't require the use of macros.
 
