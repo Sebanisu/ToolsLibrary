@@ -1,14 +1,14 @@
 version: 1.0.{build}
 environment:
   matrix:
-  #- job_name: Windows MSVC build
-  #  appveyor_build_worker_image: Visual Studio 2019
+  - job_name: Windows MSVC build
+    appveyor_build_worker_image: Visual Studio 2019
 
-  #- job_name: Linux GCC build
-  #  appveyor_build_worker_image: Ubuntu2004
-    
-  - job_name: Linux Clang build
+  - job_name: Linux GCC build
     appveyor_build_worker_image: Ubuntu2004
+    
+  #- job_name: Linux Clang build
+  #  appveyor_build_worker_image: Ubuntu2004
 for:
   - matrix:
       only:
@@ -36,6 +36,3 @@ for:
       - cmd: "mkdir build\ncmake -G \"Visual Studio 16 2019\" -B build\nMSBuild build\\ALL_BUILD.vcxproj"
     test_script:
       - cmd: "cd build\nctest -C debug --verbose\ncd .."
-#environment:
-#  CC: clang
-#  CXX: clang++
