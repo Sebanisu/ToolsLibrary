@@ -12,8 +12,9 @@
     <a href="https://GitHub.com/sebanisu/ToolsLibrary/stargazers/" alt="GitHub stars">
         <img src="https://img.shields.io/github/stars/sebanisu/ToolsLibrary.svg?style=social&label=Star" /></a>
 </p>
-Various free functions that are used in other projects.
-Well it started off with free functions. But, I made a struct. But there are free functions too :D
+I'm mirroring what [codereport](https://github.com/codereport/An-Algorithm-Library) is doing. I will be using this code in my other projects. I'm putting it into an open source library that everyone can use.
+
+My tests are wrote using [ut](https://github.com/boost-ext/ut). This is a neat library. It doesn't require the use of macros.
 
 1. `tl/input.hpp`
     * This struct takes a std::span, or a std::istream. This lets you output to a trivial types, or contiguous ranges of
