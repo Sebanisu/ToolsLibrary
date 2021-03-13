@@ -1,4 +1,4 @@
-# ToolsLibrary
+# Tools Library
 
 [![Build status](https://ci.appveyor.com/api/projects/status/1k9eepyk67kocj1p?svg=true)](https://ci.appveyor.com/project/Sebanisu/toolslibrary) 
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)]("https://github.com/sebanisu/ToolsLibrary/issues) 
