@@ -1,6 +1,7 @@
 #ifndef TOOLSLIBRARY_STRING_HPP
 #define TOOLSLIBRARY_STRING_HPP
 #include <algorithm>
+#include <filesystem>
 #include <ranges>
 namespace tl::string {
 
@@ -73,6 +74,51 @@ static std::string
 {
   remove_carriage_return(input);
   return std::move(input);
+}
+
+/**
+ * replace all slashes with the os's slashes.
+ * @param haystack string with slashes
+ */
+[[maybe_unused]] static void
+  replace_slashes(std::string &haystack)
+{
+  if constexpr (std::filesystem::path::preferred_separator == '/') {
+    std::ranges::replace(
+      haystack, '\\', std::filesystem::path::preferred_separator);
+  }
+}
+/**
+ * replace all slashes with the os's slashes.
+ * @param haystack string with slashes
+ */
+[[maybe_unused]] static std::string
+  replace_slashes(std::string &&haystack)
+{
+  replace_slashes(haystack);
+  return std::move(haystack);
+}
+/**
+ * replace all slashes with the \ slashes.
+ * @param haystack string with slashes
+ */
+[[maybe_unused]] static void
+undo_replace_slashes(std::string &haystack)
+{
+  if constexpr (std::filesystem::path::preferred_separator == '/') {
+    std::ranges::replace(
+      haystack, std::filesystem::path::preferred_separator,'\\');
+  }
+}
+/**
+ * replace all slashes with the \ slashes.
+ * @param haystack string with slashes
+ */
+[[maybe_unused]] static std::string
+undo_replace_slashes(std::string &&haystack)
+{
+  undo_replace_slashes(haystack);
+  return std::move(haystack);
 }
 }// namespace tl::string
 #endif// TOOLSLIBRARY_STRING_HPP
