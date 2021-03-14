@@ -2,10 +2,12 @@
 #define TOOLSLIBRARY_INPUT_HPP
 #include "tl/concepts.hpp"
 #include "tl/utility.hpp"
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <cstring>
 #include <istream>
+#include <ranges>
 #include <span>
 #include <variant>
 namespace tl::read {
@@ -302,6 +304,28 @@ public:
     }
     throw;
   };
+  [[nodiscard]] std::string
+    get_line()
+  {
+    std::string return_value{};
+    if (m_input.index() == 0) {
+      const auto f             = std::ranges::find(*std::get<0>(m_input), '\n');
+      const auto b             = std::ranges::begin(*std::get<0>(m_input));
+      const auto e             = std::ranges::end(*std::get<0>(m_input));
+      const auto get_line_span = [&e, &return_value](const auto i) {
+        return_value.insert(std::ranges::begin(return_value), i, e);
+        seek(std::distance(i, e));
+      };
+      if (f != e) {
+        get_line_span(f);
+      } else if (b != e) {
+        get_line_span(b);
+      }
+    } else if (m_input.index() == 0) {
+      std::getline(*std::get<1>(m_input), return_value);
+    }
+    return return_value;
+  }
 };
 }// namespace tl::read
 #endif// TOOLSLIBRARY_INPUT_HPP
