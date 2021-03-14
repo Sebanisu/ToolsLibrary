@@ -20,4 +20,7 @@ My tests are wrote using [ut](https://github.com/boost-ext/ut). This is a neat l
     * This file contains some concepts used by the rest of the library.
 4. `tl/utility.hpp`
     * This file has some free functions that the library depends on.
-    * Example: Detecting the remaining bytes in a stream. 
+      * Detecting the remaining bytes in a stream. 
+      * Generating a sequence that has an operator() that passes the sequence one at a time as a template parameter.
+5. `tl/random.hpp`
+    * This file has an iota function that gives you **X** random values in a range.
