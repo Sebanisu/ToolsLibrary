@@ -49,5 +49,30 @@ int
                          R"(c:\test\c)"s);
       test_all_drive_letters();
     };
+    "remove carriage returns from end"_test = []() {
+      static constexpr auto seq = tl::utility::sequence<1, 10>();
+      seq([]<auto T>() {
+        const auto result =
+          tl::string::remove_carriage_return_from_end(std::string(T, '\r'));
+        expect(std::ranges::size(result) == 0_ull);
+      });
+    };
+    "remove carriage returns from anywhere"_test = []() {
+      static constexpr auto seq = tl::utility::sequence<1, 10>();
+      seq([]<auto I>() {
+        const auto result =
+          tl::string::remove_carriage_return([]() -> std::string {
+            std::string r_string{};
+            r_string.reserve(3U * I);
+            for (auto i = I; i != 0; --i) {
+              r_string.push_back(' ');
+              r_string.push_back('\r');
+              r_string.push_back(' ');
+            }
+            return r_string;
+          }());
+        expect(eq(std::ranges::size(result), 2U * I));
+      });
+    };
   };
 }
