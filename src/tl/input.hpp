@@ -3,8 +3,8 @@
 #include "tl/concepts.hpp"
 #include "tl/utility.hpp"
 #include <cassert>
-#include <cstring>
 #include <cstdint>
+#include <cstring>
 #include <istream>
 #include <span>
 #include <variant>
@@ -80,7 +80,7 @@ private:
   }
   template<typename signedT>
   void
-    throw_if_seek_out_of_range(const signedT&bytes_size)
+    throw_if_seek_out_of_range(const signedT &bytes_size)
   {
     if (m_safe
         && ((bytes_size > 0)
@@ -88,11 +88,13 @@ private:
         && ((bytes_size < 0)
             && (std::distance(m_tmp_span_data,
                               std::ranges::data(*std::get<0>(m_input))))
-                 < [](auto i) {return i < 0 ? -i : i; }(bytes_size))) {
+                 < [](auto i) {
+                     return i < 0 ? -i : i;
+                   }(bytes_size))) {
       throw;
     }
   }
-  template <typename signedT>
+  template<typename signedT>
   input &
     seek_span(const signedT &bytes_size, const std::ios_base::seekdir &from)
   {
@@ -125,14 +127,16 @@ private:
       reset();
       throw_if_seek_out_of_range(bytes_size);
       const std::size_t seek_v =
-          std::ranges::size(in) - static_cast<std::size_t>([](auto i) {return i < 0 ? -i : i; }(bytes_size));
+        std::ranges::size(in) - static_cast<std::size_t>([](auto i) {
+          return i < 0 ? -i : i;
+        }(bytes_size));
       in = in.subspan(seek_v);
     } else {
       throw;
     }
     return *this;
   }
-  template <typename signedT>
+  template<typename signedT>
   input &
     seek_istream(const signedT &bytes_size, const std::ios_base::seekdir &from)
   {
@@ -273,7 +277,7 @@ public:
     output(outvar);
     return outvar;
   }
-  template <std::signed_integral signedT>
+  template<std::signed_integral signedT>
   input &
     seek(const signedT &bytes_size, const std::ios_base::seekdir &from)
   {
@@ -287,6 +291,17 @@ public:
     }
     throw;
   }
+  [[nodiscard]] auto
+    tell() const
+  {
+    if (m_input.index() == 0) {
+      return static_cast<std::size_t>(std::distance(
+        m_tmp_span_data, std::ranges::data(*std::get<0>(m_input))));
+    } else if (m_input.index() == 0) {
+      return static_cast<std::size_t>(std::get<1>(m_input)->tellg());
+    }
+    throw;
+  };
 };
 }// namespace tl::read
 #endif// TOOLSLIBRARY_INPUT_HPP
