@@ -11,7 +11,7 @@ namespace tl::utility {
  * Get remaining amount of bytes in a std::span.
  * @param in span
  */
-[[nodiscard]] static auto
+[[maybe_unused]] [[nodiscard]] static auto
   get_remaining(const std::span<const char> in)
 {
   return std::ranges::size(in);
@@ -20,7 +20,7 @@ namespace tl::utility {
  * Get remaining amount of bytes in a std::istream.
  * @param in stream
  */
-[[nodiscard]] static auto
+[[maybe_unused]] [[nodiscard]] static auto
   get_remaining(std::istream &in)
 {
   const auto current = in.tellg();
