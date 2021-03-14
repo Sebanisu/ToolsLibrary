@@ -74,5 +74,17 @@ int
         expect(eq(std::ranges::size(result), 2U * I));
       });
     };
+    if constexpr (std::filesystem::path::preferred_separator == '/') {
+      "replace slashes"_test = [] {
+        const auto result =
+          tl::string::replace_slashes(R"raw(c:\test\test2)raw"s);
+        expect(eq(result, R"raw(c:/test/test2)raw"s));
+      };
+      "undo replace slashes"_test = [] {
+        const auto result =
+          tl::string::undo_replace_slashes(R"raw(c:/test/test2)raw"s);
+        expect(eq(result, R"raw(c:\test\test2)raw"s));
+      };
+    }
   };
 }
