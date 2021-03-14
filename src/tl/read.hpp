@@ -54,8 +54,8 @@ namespace tl::read {
  */
 template<typename lambdaT>
 requires(std::invocable<lambdaT, std::istream &>)
-  [[maybe_unused]] static bool from_file(
-    const lambdaT &lambda, const std::filesystem::path &path)
+  [[maybe_unused]] static bool from_file(const lambdaT &              lambda,
+                                         const std::filesystem::path &path)
 {
   auto ofp = open_file(path);
   if (ofp.has_value() && ofp->is_open()) {// check might be redundant.
@@ -65,6 +65,12 @@ requires(std::invocable<lambdaT, std::istream &>)
   }
   return false;
 }
+/**
+ * Read a value out of a file at offset.
+ * @tparam outputT type of value.
+ * @param offset from start of file where value is.
+ * @param path location on computer where the file is.
+ */
 template<concepts::is_trivially_copyable_and_default_constructible outputT>
 [[maybe_unused]] [[nodiscard]] static outputT
   from_file(const long &offset, const std::filesystem::path &path)
@@ -77,6 +83,12 @@ template<concepts::is_trivially_copyable_and_default_constructible outputT>
     path);
   return output;
 }
+/**
+ * Read a range of data from the file at the given offset.
+ * @tparam out_rangeT type of output range.
+ * @param in_path location on computer where the file is.
+ * @param out output range.
+ */
 template<concepts::is_contiguous_and_resizable out_rangeT>
 [[nodiscard]] out_rangeT
   entire_file(std::filesystem::path in_path, out_rangeT &&out)
@@ -87,6 +99,8 @@ template<concepts::is_contiguous_and_resizable out_rangeT>
     },
     in_path);
   return std::move(out);//-Wreturn-std-move
+  // clang tidy wants to not return with a move. but I got a warning from GCC
+  // that this is a copy if not returned by move!
 }
 }// namespace tl::read
 #endif// TOOLSLIBRARY_READ_HPP
