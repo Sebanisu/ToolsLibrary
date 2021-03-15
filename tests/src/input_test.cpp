@@ -454,16 +454,6 @@ int
       };
     }
     {
-      // TODO test tell
-      "tell, span"_test = [] {
-
-      };
-
-      "tell, istream"_test = [] {
-
-      };
-      // TODO test read_line
-
       static constexpr std::string_view read_line_str(R"(c:\one\two
 d:\three\four
 e:\five\six
@@ -473,6 +463,14 @@ g:\nine\ten)");
       ss << read_line_str;
       "check ss size to match read line str"_test = [&ss] {
         expect(static_cast<std::size_t>(ss.tellp()) == read_line_str.size());
+      };
+      // TODO test tell
+      "tell, span"_test = [] {
+
+      };
+
+      "tell, istream"_test = [] {
+
       };
       "tell, read line"_test = [] {
         const tl::read::input    input(read_line_str);
@@ -484,11 +482,20 @@ g:\nine\ten)");
             break;
           }
         }
-        expect(eq(std::ranges::size(lines), 5U))<<lines.back();
+        expect(eq(std::ranges::size(lines), 5U)) << lines.back();
       };
 
-      "tell, read line"_test = [] {
-
+      "tell, read line"_test = [&ss] {
+        const tl::read::input    input(&ss);
+        std::vector<std::string> lines{};
+        while (true) {
+          const std::string &line = lines.emplace_back(input.get_line());
+          if (std::empty(line)) {
+            lines.pop_back();
+            break;
+          }
+        }
+        expect(eq(std::ranges::size(lines), 5U)) << lines.back();
       };
     }
   };
