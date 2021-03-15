@@ -5,6 +5,64 @@
 #include <ranges>
 namespace tl::string {
 
+auto
+  search(const auto &b1, const auto &e1, const auto &b2, const auto &e2)
+{
+  auto f = std::search(b1, e1, b2, e2);
+  if (f != e1) {
+    return std::optional<decltype(f)>(f);
+  }
+  return std::optional<decltype(f)>();
+}
+
+auto
+  search(const auto              b1,
+         const std::string &     haystack,
+         const std::string_view &needle)
+{
+  const auto e1 = std::ranges::end(haystack);
+  const auto b2 = std::ranges::begin(needle);
+  const auto e2 = std::ranges::end(needle);
+  return string::search(b1, e1, b2, e2);
+}
+
+auto
+  search(const std::string &haystack, const std::string_view &needle)
+{
+
+  const auto b1 = std::ranges::begin(haystack);
+  return string::search(b1, haystack, needle);
+}
+
+/**
+ * @see https://www.oreilly.com/library/view/c-cookbook/0596007612/ch04s12.html
+ */
+void
+  erase_string_from_string(std::string &           haystack,
+                           const std::string_view &needle)
+{
+  for (auto f = search(haystack, needle); f.has_value();
+       f      = search(f.value(), haystack, needle)) {
+    haystack.erase(f.value(),
+                   f.value() + static_cast<long>(std::ranges::size(needle)));
+  }
+}
+
+/**
+ * remove all sub string values from string.
+ * @param haystack string with needles to remove
+ * @param needle string_view of what needs removed.
+ * @return
+ * @see https://www.oreilly.com/library/view/c-cookbook/0596007612/ch04s12.html
+ */
+std::string
+  erase_string_from_string(std::string &&          haystack,
+                           const std::string_view &needle)
+{
+  erase_string_from_string(haystack, needle);
+  return std::move(haystack);
+}
+
 /**
  * Remove c:\ drive letter from start of file.
  * @param input path string
@@ -34,6 +92,28 @@ static void
   return std::move(input);
 }
 
+static void
+remove_all_drive_letters(std::string &heystack)
+{
+  const auto letters =
+    std::string_view("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  const auto slashes = std::string_view(R"(\/)");
+  const auto colon   = ':';
+  for (const auto &letter : letters) {
+    for (const auto slash : slashes) {
+      std::array<char, 3U> needle = { letter, colon, slash };
+      erase_string_from_string(
+        heystack,
+        std::string_view(std::ranges::begin(needle), std::ranges::end(needle)));
+    }
+  }
+}
+static std::string
+remove_all_drive_letters(std::string &&heystack)
+{
+  remove_all_drive_letters(heystack);
+  return std::move(heystack);
+}
 /**
  * Remove the \r from the end of the string
  * @param input
