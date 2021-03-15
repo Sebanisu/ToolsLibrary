@@ -314,7 +314,7 @@ public:
       const auto e             = std::ranges::end(*std::get<0>(m_input));
       const auto get_line_span = [&e, &return_value](const auto i) {
         return_value.insert(std::ranges::begin(return_value), i, e);
-        seek(std::distance(i, e));
+        seek(std::distance(i, e), std::ios::cur);
       };
       if (f != e) {
         get_line_span(f);
