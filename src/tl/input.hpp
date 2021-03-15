@@ -312,7 +312,7 @@ public:
       const auto f             = std::ranges::find(*std::get<0>(m_input), '\n');
       const auto b             = std::ranges::begin(*std::get<0>(m_input));
       const auto e             = std::ranges::end(*std::get<0>(m_input));
-      const auto get_line_span = [&e, &return_value](const auto i) {
+      const auto get_line_span = [&e, &return_value, this](const auto i) {
         return_value.insert(std::ranges::begin(return_value), i, e);
         seek(std::distance(i, e), std::ios::cur);
       };
