@@ -35,17 +35,25 @@ namespace tl::string {
 }
 
 /**
+ * remove all sub string values from string.
+ * @param haystack string with needles to remove
+ * @param needle string_view of what needs removed.
  * @see https://www.oreilly.com/library/view/c-cookbook/0596007612/ch04s12.html
  */
-void
-  erase_string_from_string(std::string &           haystack,
-                           const std::string_view &needle)
+template<typename... T>
+requires(std::is_same_v<std::string_view, std::decay_t<T>>
+           &&...) void erase_string_from_string(std::string &haystack,
+                                                const T &...needle)
 {
-  for (auto f = search(haystack, needle); f.has_value();
-       f      = search(f.value(), haystack, needle)) {
-    haystack.erase(f.value(),
-                   f.value() + static_cast<long>(std::ranges::size(needle)));
-  }
+  (
+    [&haystack](const std::string_view &n) {
+      for (auto f = search(haystack, n); f.has_value();
+           f      = search(f.value(), haystack, n)) {
+        haystack.erase(f.value(),
+                       f.value() + static_cast<long>(std::ranges::size(n)));
+      }
+    }(needle),
+    ...);
 }
 
 /**
@@ -55,11 +63,12 @@ void
  * @return
  * @see https://www.oreilly.com/library/view/c-cookbook/0596007612/ch04s12.html
  */
-[[nodiscard]] [[maybe_unused]] std::string
-  erase_string_from_string(std::string &&          haystack,
-                           const std::string_view &needle)
+template<typename... T>
+requires(std::is_same_v<std::string_view, std::decay_t<T>>)
+  [[nodiscard]] [[maybe_unused]] std::string
+  erase_string_from_string(std::string &&haystack, const T &...needle)
 {
-  erase_string_from_string(haystack, needle);
+  erase_string_from_string(haystack, needle...);
   return std::move(haystack);
 }
 
