@@ -204,20 +204,20 @@ public:
     throw;
   }
   template<concepts::is_trivially_copyable... outvarT>
-  requires(sizeof...(outvarT) > 1) void output(outvarT &...outvar)
+  requires(sizeof...(outvarT) > 1) void output(outvarT &...outvar) const
   {
     (output(outvar), ...);
   }
   template<concepts::is_trivially_copyable_and_default_constructible outvarT>
   outvarT
-    output()
+    output() const
   {
     outvarT outvar{};
     output(outvar);
     return outvar;
   }
   template<concepts::is_trivially_copyable_and_default_constructible... outvarT>
-  requires(sizeof...(outvarT) > 1) [[nodiscard]] std::tuple<outvarT...> output()
+  requires(sizeof...(outvarT) > 1) [[nodiscard]] std::tuple<outvarT...> output() const
   {
     return std::tuple<outvarT...>{ output<outvarT>()... };
   }
