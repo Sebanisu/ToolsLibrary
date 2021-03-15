@@ -21,7 +21,7 @@ private:
    * span. If in the future we wanted to rewind we'd need another pointer to
    * store the original beginning.
    */
-  std::span<const char> m_tmp_span{};
+  mutable std::span<const char> m_tmp_span{};
   /**
    * Used for seeking with spans. If we are seeking from begin.
    */
@@ -71,7 +71,7 @@ private:
     copy(&outvar, tmp);
   }
   [[nodiscard]] std::size_t
-    get_remaining()
+    get_remaining() const
   {
     if (m_input.index() == 0) {
       return tl::utility::get_remaining(*std::get<0>(m_input));
@@ -82,7 +82,7 @@ private:
   }
   template<typename signedT>
   void
-    throw_if_seek_out_of_range(const signedT &bytes_size)
+    throw_if_seek_out_of_range(const signedT &bytes_size) const
   {
     if (m_safe
         && ((bytes_size > 0)
@@ -97,8 +97,9 @@ private:
     }
   }
   template<typename signedT>
-  input &
-    seek_span(const signedT &bytes_size, const std::ios_base::seekdir &from)
+  const input &
+    seek_span(const signedT &               bytes_size,
+              const std::ios_base::seekdir &from) const
   {
     assert(m_tmp_span_data != nullptr);
     auto &     in    = *std::get<0>(m_input);
@@ -139,8 +140,9 @@ private:
     return *this;
   }
   template<typename signedT>
-  input &
-    seek_istream(const signedT &bytes_size, const std::ios_base::seekdir &from)
+  const input &
+    seek_istream(const signedT &               bytes_size,
+                 const std::ios_base::seekdir &from) const
   {
     auto &in = *std::get<1>(m_input);
     assert(!((from == std::ios::end && bytes_size > 0)
@@ -150,7 +152,7 @@ private:
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   void
-    output_span(outvarT &outvar, size_t size)
+    output_span(outvarT &outvar, size_t size) const
   {
     auto &in = *std::get<0>(m_input);
     copy(std::ranges::data(outvar), in, size);
@@ -158,7 +160,7 @@ private:
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   void
-    output_istream(outvarT &outvar, size_t size)
+    output_istream(outvarT &outvar, size_t size) const
   {
     auto &            in = *std::get<1>(m_input);
     std::vector<char> tmp(size);
@@ -183,7 +185,7 @@ public:
   {}
   template<concepts::is_trivially_copyable outvarT>
   void
-    output(outvarT &outvar)
+    output(outvarT &outvar) const
   {
     if (m_safe && sizeof(outvar) > get_remaining()) {
       return;
@@ -217,7 +219,7 @@ public:
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   void
-    output(outvarT &outvar)
+    output(outvarT &outvar) const
   {
     using value_type = std::decay_t<typename outvarT::value_type>;
     std::size_t size = std::ranges::size(outvar) * sizeof(value_type);
@@ -234,26 +236,26 @@ public:
     throw;
   }
   template<concepts::is_contiguous_and_resizable... outvarT>
-  requires(sizeof...(outvarT) > 1) void output(outvarT &...outvar)
+  requires(sizeof...(outvarT) > 1) void output(outvarT &...outvar) const
   {
     (output(outvar), ...);
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   requires(!std::is_reference_v<outvarT>) [[nodiscard]] outvarT
-    output(outvarT &&outvar)
+    output(outvarT &&outvar) const
   {
     output(outvar);
     return std::move(outvar);
   }
   template<concepts::is_contiguous_and_resizable... outvarT>
   requires((sizeof...(outvarT) > 1U) && (!std::is_reference_v<outvarT> && ...))
-    [[nodiscard]] std::tuple<outvarT...> output(outvarT &&...outvar)
+    [[nodiscard]] std::tuple<outvarT...> output(outvarT &&...outvar) const
   {
     return std::tuple<outvarT...>{ output(std::forward(outvar))... };
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   void
-    output_all_remaining(outvarT &outvar)
+    output_all_remaining(outvarT &outvar) const
   {
     using value_type = std::decay_t<typename outvarT::value_type>;
     std::size_t size = get_remaining() / sizeof(value_type);
@@ -262,14 +264,14 @@ public:
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   [[nodiscard]] outvarT
-    output_all_remaining(outvarT &&outvar)
+    output_all_remaining(outvarT &&outvar) const
   {
     output_all_remaining(outvar);
     return std::move(outvar);
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   [[nodiscard]] outvarT
-    output(const size_t bytes_size)
+    output(const size_t bytes_size) const
   {
     outvarT outvar{};
     using value_type = std::decay_t<typename outvarT::value_type>;
@@ -280,8 +282,8 @@ public:
     return outvar;
   }
   template<std::signed_integral signedT>
-  input &
-    seek(const signedT &bytes_size, const std::ios_base::seekdir &from)
+  const input &
+    seek(const signedT &bytes_size, const std::ios_base::seekdir &from) const
   {
     if (bytes_size == 0 && from == std::ios::cur) {
       return *this;
@@ -305,21 +307,23 @@ public:
     throw;
   };
   [[nodiscard]] std::string
-    get_line()
+    get_line() const
   {
     std::string return_value{};
     if (m_input.index() == 0) {
       const auto f             = std::ranges::find(*std::get<0>(m_input), '\n');
       const auto b             = std::ranges::begin(*std::get<0>(m_input));
       const auto e             = std::ranges::end(*std::get<0>(m_input));
-      const auto get_line_span = [&e, &return_value, this](const auto i) {
-        return_value.insert(std::ranges::begin(return_value), i, e);
-        seek(std::distance(i, e), std::ios::cur);
+      const auto get_line_span = [&return_value, this](const auto &first,
+                                                       const auto &last,
+                                                       const int   offset = 0) {
+        return_value.insert(std::ranges::begin(return_value), first, last);
+        seek(std::distance(first, last) + offset, std::ios::cur);
       };
       if (f != e) {
-        get_line_span(f);
+        get_line_span(b, f, 1);
       } else if (b != e) {
-        get_line_span(b);
+        get_line_span(b, e);
       }
     } else if (m_input.index() == 1) {
       std::getline(*std::get<1>(m_input), return_value);
