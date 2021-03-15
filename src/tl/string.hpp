@@ -5,7 +5,7 @@
 #include <ranges>
 namespace tl::string {
 
-auto
+[[nodiscard]] [[maybe_unused]] auto
   search(const auto &b1, const auto &e1, const auto &b2, const auto &e2)
 {
   auto f = std::search(b1, e1, b2, e2);
@@ -15,7 +15,7 @@ auto
   return std::optional<decltype(f)>();
 }
 
-auto
+[[nodiscard]] [[maybe_unused]] auto
   search(const auto              b1,
          const std::string &     haystack,
          const std::string_view &needle)
@@ -26,7 +26,7 @@ auto
   return string::search(b1, e1, b2, e2);
 }
 
-auto
+[[nodiscard]] [[maybe_unused]] auto
   search(const std::string &haystack, const std::string_view &needle)
 {
 
@@ -55,7 +55,7 @@ void
  * @return
  * @see https://www.oreilly.com/library/view/c-cookbook/0596007612/ch04s12.html
  */
-std::string
+[[nodiscard]] [[maybe_unused]] std::string
   erase_string_from_string(std::string &&          haystack,
                            const std::string_view &needle)
 {
@@ -85,7 +85,7 @@ static void
  * @param input path string
  * @return modified string
  */
-[[maybe_unused]] static std::string
+[[nodiscard]] [[maybe_unused]] static std::string
   remove_drive_letter(std::string &&input)
 {
   remove_drive_letter(input);
@@ -93,7 +93,7 @@ static void
 }
 
 static void
-remove_all_drive_letters(std::string &heystack)
+  remove_all_drive_letters(std::string &heystack)
 {
   const auto letters =
     std::string_view("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
@@ -108,8 +108,8 @@ remove_all_drive_letters(std::string &heystack)
     }
   }
 }
-static std::string
-remove_all_drive_letters(std::string &&heystack)
+[[nodiscard]] [[maybe_unused]] static std::string
+  remove_all_drive_letters(std::string &&heystack)
 {
   remove_all_drive_letters(heystack);
   return std::move(heystack);
@@ -130,7 +130,7 @@ static void
  * Remove the \r from the end of the string
  * @param input
  */
-[[maybe_unused]] static std::string
+[[nodiscard]] [[maybe_unused]] static std::string
   remove_carriage_return_from_end(std::string &&input)
 {
   remove_carriage_return_from_end(input);
@@ -149,7 +149,7 @@ static void
  * Remove the \r from the any part of the string
  * @param input
  */
-[[maybe_unused]] static std::string
+[[nodiscard]] [[maybe_unused]] static std::string
   remove_carriage_return(std::string &&input)
 {
   remove_carriage_return(input);
