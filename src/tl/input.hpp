@@ -147,6 +147,10 @@ private:
     auto &in = *std::get<1>(m_input);
     assert(!((from == std::ios::end && bytes_size > 0)
              || (from == std::ios::beg && bytes_size < 0)));
+    if (from == std::ios::beg) {
+      in.clear();// If you read to end fail bit gets set. This will unset it
+                 // when you seek from begin.
+    }
     in.seekg(bytes_size, from);
     return *this;
   }

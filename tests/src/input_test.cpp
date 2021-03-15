@@ -472,8 +472,7 @@ g:\nine\ten)");
       "tell, istream"_test = [] {
 
       };
-      "tell, read line"_test = [] {
-        const tl::read::input    input(read_line_str);
+      static const auto check_read_line = [](const tl::read::input &input) {
         std::vector<std::string> lines{};
         while (true) {
           const std::string &line = lines.emplace_back(input.get_line());
@@ -483,19 +482,23 @@ g:\nine\ten)");
           }
         }
         expect(eq(std::ranges::size(lines), 5U)) << lines.back();
+        input.seek(0, std::ios::beg);
+      };
+
+      "tell, read line"_test = [] {
+        check_read_line(tl::read::input(read_line_str));
       };
 
       "tell, read line"_test = [&ss] {
-        const tl::read::input    input(&ss);
-        std::vector<std::string> lines{};
-        while (true) {
-          const std::string &line = lines.emplace_back(input.get_line());
-          if (std::empty(line)) {
-            lines.pop_back();
-            break;
-          }
-        }
-        expect(eq(std::ranges::size(lines), 5U)) << lines.back();
+        check_read_line(tl::read::input(&ss));
+      };
+
+      "tell, read line, safe check"_test = [] {
+        check_read_line(tl::read::input(read_line_str, true));
+      };
+
+      "tell, read line, safe check"_test = [&ss] {
+        check_read_line(tl::read::input(&ss, true));
       };
     }
   };
