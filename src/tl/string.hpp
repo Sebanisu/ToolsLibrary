@@ -41,9 +41,11 @@ namespace tl::string {
  * @see https://www.oreilly.com/library/view/c-cookbook/0596007612/ch04s12.html
  */
 template<typename... T>
-requires(std::is_same_v<std::string_view, std::decay_t<T>>
-           &&...) void erase_string_from_string(std::string &haystack,
-                                                const T &...needle)
+requires(
+  (std::is_convertible_v<
+    std::string_view,
+    std::decay_t<T>>)&&...) void erase_string_from_string(std::string &haystack,
+                                                          const T &...needle)
 {
   (
     [&haystack](const std::string_view &n) {
@@ -64,7 +66,7 @@ requires(std::is_same_v<std::string_view, std::decay_t<T>>
  * @see https://www.oreilly.com/library/view/c-cookbook/0596007612/ch04s12.html
  */
 template<typename... T>
-requires(std::is_same_v<std::string_view, std::decay_t<T>>)
+requires((std::is_convertible_v<std::string_view, std::decay_t<T>>)&&...)
   [[nodiscard]] [[maybe_unused]] std::string
   erase_string_from_string(std::string &&haystack, const T &...needle)
 {
