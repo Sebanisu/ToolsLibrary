@@ -306,6 +306,10 @@ public:
       return static_cast<std::size_t>(std::distance(
         m_tmp_span_data, std::ranges::data(*std::get<0>(m_input))));
     } else if (m_input.index() == 1) {
+      if (!std::get<1>(m_input)->good()) {
+        std::get<1>(m_input)->clear();
+        std::get<1>(m_input)->seekg(0, std::ios::end);
+      }
       return static_cast<std::size_t>(std::get<1>(m_input)->tellg());
     }
     throw;

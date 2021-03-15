@@ -464,13 +464,42 @@ g:\nine\ten)");
       "check ss size to match read line str"_test = [&ss] {
         expect(static_cast<std::size_t>(ss.tellp()) == read_line_str.size());
       };
-      // TODO test tell
-      "tell, span"_test = [] {
 
+      static constexpr auto check_tell = [](const tl::read::input &input) {
+        static constexpr auto get_line =
+          [](const tl::read::input &input_2) -> std::size_t {
+          const auto dont_care = input_2.get_line();
+          return std::ranges::size(dont_care);
+        };
+
+        for (std::size_t line_total{};;) {
+          const auto line_size = get_line(input);
+          line_total += line_size;
+          if (line_size == 0U) {
+            break;
+          }
+          line_total += 1U;
+          if(input.tell() != line_total-1) {// the last one will be true
+            expect(eq(input.tell(), line_total));
+          }
+        }
+        input.seek(0, std::ios::beg);
       };
 
-      "tell, istream"_test = [] {
+      "tell, read line"_test = [] {
+        check_tell(tl::read::input(read_line_str));
+      };
 
+      "tell, read line"_test = [&ss] {
+        check_tell(tl::read::input(&ss));
+      };
+
+      "tell, read line, safe check"_test = [] {
+        check_tell(tl::read::input(read_line_str, true));
+      };
+
+      "tell, read line, safe check"_test = [&ss] {
+        check_tell(tl::read::input(&ss, true));
       };
       static const auto check_read_line = [](const tl::read::input &input) {
         std::vector<std::string> lines{};
