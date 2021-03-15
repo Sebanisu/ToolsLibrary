@@ -299,7 +299,7 @@ public:
     if (m_input.index() == 0) {
       return static_cast<std::size_t>(std::distance(
         m_tmp_span_data, std::ranges::data(*std::get<0>(m_input))));
-    } else if (m_input.index() == 0) {
+    } else if (m_input.index() == 1) {
       return static_cast<std::size_t>(std::get<1>(m_input)->tellg());
     }
     throw;
@@ -321,7 +321,7 @@ public:
       } else if (b != e) {
         get_line_span(b);
       }
-    } else if (m_input.index() == 0) {
+    } else if (m_input.index() == 1) {
       std::getline(*std::get<1>(m_input), return_value);
     }
     return return_value;
