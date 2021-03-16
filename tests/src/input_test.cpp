@@ -9,6 +9,8 @@ int
   using namespace boost::ut::literals;
   using namespace boost::ut::operators::terse;
   using namespace boost::ut;
+  using namespace std::string_view_literals;
+  using namespace std::string_literals;
   [[maybe_unused]] suite input = [] {
     {
       static constexpr auto buffer = std::string_view("\x01\x00\x00\x00", 4U);
@@ -510,18 +512,10 @@ g:\nine\ten)");
             break;
           }
         }
-        expect(eq(std::ranges::size(lines), 5U)) << [&lines]() {
-            if (std::ranges::empty(lines))
-            {
-                return lines.back();
-            }
-            else {
-                return ""s;
-            }
-        };
+        expect(eq(std::ranges::size(lines), 5U));
         input.seek(0, std::ios::beg);
       };
-
+      
       "tell, read line"_test = [] {
         check_read_line(tl::read::input(read_line_str));
       };
