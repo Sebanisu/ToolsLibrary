@@ -10,7 +10,7 @@ int
   using namespace boost::ut;
   using namespace std::string_view_literals;
   using namespace std::string_literals;
-  suite random = [] {
+  [[maybe_unused]] suite random = [] {
     const auto check_type = []<std::integral integralT>() {
       const auto random_values = tl::random::iota<char, 10U>();
       expect(std::ranges::any_of(random_values, [](const auto &value) -> bool {

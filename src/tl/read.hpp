@@ -16,7 +16,7 @@ namespace tl::read {
  * @return
  * @todo test?
  */
-[[nodiscard]] inline std::optional<std::ifstream>
+[[nodiscard]] std::optional<std::ifstream>
   open_file(const std::filesystem::path &path)
 {
   std::optional<std::ifstream> ofp{};
@@ -53,7 +53,7 @@ namespace tl::read {
  * @todo test?
  */
 template<typename lambdaT>
-requires(std::invocable<lambdaT, std::istream &>) inline bool from_file(
+requires(std::invocable<lambdaT, std::istream &>) bool from_file(
   const lambdaT &lambda, const std::filesystem::path &path)
 {
   auto ofp = open_file(path);
@@ -71,7 +71,7 @@ requires(std::invocable<lambdaT, std::istream &>) inline bool from_file(
  * @param path location on computer where the file is.
  */
 template<concepts::is_trivially_copyable_and_default_constructible outputT>
-[[nodiscard]] inline outputT
+[[nodiscard]] outputT
   from_file(const long &offset, const std::filesystem::path &path)
 {
   outputT output{};

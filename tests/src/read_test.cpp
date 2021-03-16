@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <sstream>
 #include <string_view>
-inline std::optional<std::filesystem::path>
+std::optional<std::filesystem::path>
   create_temp_file()
 {
   using namespace std::string_view_literals;
@@ -20,7 +20,7 @@ int
   using namespace boost::ut;
   using namespace std::string_view_literals;
   using namespace std::string_literals;
-  suite read = [] {
+  [[maybe_unused]] suite read = [] {
     const auto temp_file_path = create_temp_file();
     "create temp file"_test   = [&temp_file_path] {
       expect(temp_file_path.has_value());

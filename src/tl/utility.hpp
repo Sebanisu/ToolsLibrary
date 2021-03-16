@@ -11,7 +11,7 @@ namespace tl::utility {
  * Get remaining amount of bytes in a std::span.
  * @param in span
  */
-[[nodiscard]] inline auto
+[[nodiscard]] auto
   get_remaining(const std::span<const char> in)
 {
   return std::ranges::size(in);
@@ -20,7 +20,7 @@ namespace tl::utility {
  * Get remaining amount of bytes in a std::istream.
  * @param in stream
  */
-[[nodiscard]] inline auto
+[[nodiscard]] auto
   get_remaining(std::istream &in)
 {
   const auto current = in.tellg();
@@ -35,7 +35,7 @@ namespace tl::utility {
  * @param data data you want wrote to the file.
  * @return optional path to file
  */
-[[nodiscard]] inline std::optional<std::filesystem::path>
+[[nodiscard]] std::optional<std::filesystem::path>
   create_temp_file(const std::filesystem::path &file_name,
                    const std::string_view &     data)
 {

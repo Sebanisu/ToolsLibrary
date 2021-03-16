@@ -9,7 +9,7 @@
 #include <ranges>
 namespace tl::random {
 /**
- * Random holder should be defined as a inline value.
+ * Random holder should be defined as a  value.
  * @tparam T type of value returned by operator()
  * @see if we can make this passable to a std::transform
  * @todo maybe a form of random_impl should be moved to toolslibrary.
@@ -27,7 +27,7 @@ private:
 
 public:
   auto
-    operator()(const T &unused) const
+    operator()([[maybe_unused]] const T &unused) const
   {
     return static_cast<T>(dis(gen));
   }
@@ -42,7 +42,7 @@ requires(std::is_integral_v<
          std::decay_t<typename rangeT::value_type>>) void iota(rangeT &out)
 {
   using T                    = std::decay_t<typename rangeT::value_type>;
-  inline const auto random_T = impl<T>();
+  static const auto random_T = impl<T>();
   std::ranges::transform(out, std::begin(out), [](const T &unused) -> T {
     return random_T(unused);
   });

@@ -6,7 +6,7 @@
 #define TOOLSLIBRARY_ALGORITHM_HPP
 namespace tl::algorithm {
 template<typename B1, typename E1, typename... BS, typename OP>
-inline void
+void
   for_each(const OP op, B1 b, const E1 e, BS... bs)
 {
   for (; b != e; ++b, (++bs, ...)) {

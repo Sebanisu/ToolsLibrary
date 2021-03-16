@@ -9,10 +9,10 @@ int
   using namespace boost::ut::literals;
   using namespace boost::ut::operators::terse;
   using namespace boost::ut;
-  suite input = [] {
+  [[maybe_unused]] suite input = [] {
     {
-      inline constexpr auto buffer = std::string_view("\x01\x00\x00\x00", 4U);
-      inline constexpr auto longer_buffer = std::string_view(
+      static constexpr auto buffer = std::string_view("\x01\x00\x00\x00", 4U);
+      static constexpr auto longer_buffer = std::string_view(
         "\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00", 12U);
       std::stringstream ss{};
       ss.write(std::ranges::data(longer_buffer),
@@ -454,7 +454,7 @@ int
       };
     }
     {
-      inline constexpr std::string_view read_line_str(R"(c:\one\two
+      static constexpr std::string_view read_line_str(R"(c:\one\two
 d:\three\four
 e:\five\six
 f:\seven\eight
@@ -465,8 +465,8 @@ g:\nine\ten)");
         expect(static_cast<std::size_t>(ss.tellp()) == read_line_str.size());
       };
 
-      inline constexpr auto check_tell = [](const tl::read::input &input) {
-        inline constexpr auto get_line =
+      static constexpr auto check_tell = [](const tl::read::input &input) {
+        static constexpr auto get_line =
           [](const tl::read::input &input_2) -> std::size_t {
           const auto dont_care = input_2.get_line();
           return std::ranges::size(dont_care);
@@ -501,7 +501,7 @@ g:\nine\ten)");
       "tell, read line, safe check"_test = [&ss] {
         check_tell(tl::read::input(&ss, true));
       };
-      inline const auto check_read_line = [](const tl::read::input &input) {
+      static const auto check_read_line = [](const tl::read::input &input) {
         std::vector<std::string> lines{};
         while (true) {
           const std::string &line = lines.emplace_back(input.get_line());
