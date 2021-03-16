@@ -510,7 +510,15 @@ g:\nine\ten)");
             break;
           }
         }
-        expect(eq(std::ranges::size(lines), 5U)) << lines.back();
+        expect(eq(std::ranges::size(lines), 5U)) << [&lines]() {
+            if (std::ranges::empty(lines))
+            {
+                return lines.back();
+            }
+            else {
+                return ""s;
+            }
+        };
         input.seek(0, std::ios::beg);
       };
 

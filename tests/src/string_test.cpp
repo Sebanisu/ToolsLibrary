@@ -32,14 +32,14 @@ int
           all_lowercase_letters([&test_drive_letter]<auto I>() {
             test_drive_letter(std::string{ char(I), ':', '\\' });
           });
-          all_UPPERCASE_letters([&test_drive_letter]<auto I>() {
-            test_drive_letter(std::string{ char(I), ':', '\\' });
+          all_UPPERCASE_letters([&test_drive_letter]<auto I2>() {
+            test_drive_letter(std::string{ char(I2), ':', '\\' });
           });
-          all_lowercase_letters([&test_drive_letter]<auto I>() {
-            test_drive_letter(std::string{ char(I), ':', '/' });
+          all_lowercase_letters([&test_drive_letter]<auto I3>() {
+            test_drive_letter(std::string{ char(I3), ':', '/' });
           });
-          all_UPPERCASE_letters([&test_drive_letter]<auto I>() {
-            test_drive_letter(std::string{ char(I), ':', '/' });
+          all_UPPERCASE_letters([&test_drive_letter]<auto I4>() {
+            test_drive_letter(std::string{ char(I4), ':', '/' });
           });
         };
         test_drive_letters(R"(c:\)"s,
@@ -55,24 +55,24 @@ int
         seq([]<auto T>() {
           const auto result =
             tl::string::remove_carriage_return_from_end(std::string(T, '\r'));
-          expect(std::ranges::size(result) == 0_ull);
+          expect(std::ranges::empty(result));
         });
       };
       "remove carriage returns from anywhere"_test = []() {
         static constexpr auto seq = tl::utility::sequence<1, 10>();
-        seq([]<auto I>() {
+        seq([]<auto I5>() {
           const auto result =
             tl::string::remove_carriage_return([]() -> std::string {
               std::string r_string{};
-              r_string.reserve(3U * I);
-              for (auto i = I; i != 0; --i) {
+              r_string.reserve(3U * I5);
+              for (auto i = I5; i != 0; --i) {
                 r_string.push_back(' ');
                 r_string.push_back('\r');
                 r_string.push_back(' ');
               }
               return r_string;
             }());
-          expect(eq(std::ranges::size(result), 2U * I));
+          expect(eq(std::ranges::size(result), 2U * I5));
         });
       };
       if constexpr (std::filesystem::path::preferred_separator == '/') {
@@ -103,7 +103,7 @@ c:\test6\test7)"s,
     "remove all drive letters"_test = [] {
       const auto value = tl::string::remove_all_drive_letters(
         R"(a:\b:\c:\d:\e:\f:\g:\h:\i:\j:\k:\l:\m:\n:\o:\p:\q:\r:\s:\t:\u:\v:\w:\x:\y:\z:\a:/b:/c:/d:/e:/f:/g:/h:/i:/j:/k:/l:/m:/n:/o:/p:/q:/r:/s:/t:/u:/v:/w:/x:/y:/z:/)"s);
-      expect(std::ranges::size(value) == 0_ull);
+      expect(std::ranges::empty(value));
     };
   };
 }

@@ -132,7 +132,7 @@ void
 void
   remove_carriage_return_from_end(std::string &input)
 {
-  while (input.back() == '\r') {
+  while (!std::ranges::empty(input) && input.back() == '\r') {
     input.pop_back();
   }
 }
