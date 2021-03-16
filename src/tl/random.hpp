@@ -14,15 +14,16 @@ namespace tl::random {
  * @see if we can make this passable to a std::transform
  * @todo maybe a form of random_impl should be moved to toolslibrary.
  */
-template<typename T> struct impl
+template<std::integral T> struct impl
 {
 private:
-  static_assert(std::is_integral_v<T>);
+
+    using unsigned_t = std::make_unsigned_t<T>;
   std::random_device                                             rd{};
   mutable std::mt19937                                           gen{ rd() };
-  mutable std::uniform_int_distribution<std::make_unsigned_t<T>> dis{
-    std::numeric_limits<std::make_unsigned_t<T>>::min(),
-    std::numeric_limits<std::make_unsigned_t<T>>::max()
+  mutable std::uniform_int_distribution<std::size_t> dis{
+    std::numeric_limits<unsigned_t>::min(),
+    std::numeric_limits<unsigned_t>::max()
   };
 
 public:

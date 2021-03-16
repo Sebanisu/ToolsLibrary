@@ -17,9 +17,9 @@ int
         return value != integralT{};
       }));
     };
-    const auto check_types = [&check_type]<std::integral... integralT>()
+    const auto check_types = [&check_type]<std::integral... integralT2>()
     {
-      (check_type.template operator()<integralT>(), ...);
+      (check_type.template operator()<integralT2>(), ...);
     };
     "create random char array"_test = [&check_types] {
       check_types.operator()<std::int8_t,

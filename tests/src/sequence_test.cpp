@@ -14,8 +14,8 @@ int
     "create random char array"_test = [] {
       auto s = tl::utility::sequence<0, 10>();
       s([]<auto I>() {
-        expect(I <= 10_ull);
-        expect(I >= 0_ull);
+        expect(le(I, 10U));
+        expect(ge(I, 0U));
       });
     };
   };
