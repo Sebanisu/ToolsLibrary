@@ -29,17 +29,17 @@ int
         static constexpr auto all_UPPERCASE_letters =
           tl::utility::sequence<'A', 'Z' - 'A'>();
         const auto test_all_drive_letters = [&test_drive_letter]() {
-          all_lowercase_letters.operator()([&test_drive_letter]<auto I>() {
-            test_drive_letter(std::string{ char(I), ':', '\\' });
+          all_lowercase_letters.operator()([&test_drive_letter]<auto I2>() {
+            test_drive_letter(std::string{ char(I2), ':', '\\' });
           });
-          all_UPPERCASE_letters.operator()([&test_drive_letter]<auto I>() {
-            test_drive_letter(std::string{ char(I), ':', '\\' });
+          all_UPPERCASE_letters.operator()([&test_drive_letter]<auto I2>() {
+            test_drive_letter(std::string{ char(I2), ':', '\\' });
           });
-          all_lowercase_letters.operator()([&test_drive_letter]<auto I>() {
-            test_drive_letter(std::string{ char(I), ':', '/' });
+          all_lowercase_letters.operator()([&test_drive_letter]<auto I2>() {
+            test_drive_letter(std::string{ char(I2), ':', '/' });
           });
-          all_UPPERCASE_letters.operator()([&test_drive_letter]<auto I>() {
-            test_drive_letter(std::string{ char(I), ':', '/' });
+          all_UPPERCASE_letters.operator()([&test_drive_letter]<auto I2>() {
+            test_drive_letter(std::string{ char(I2), ':', '/' });
           });
         };
         test_drive_letters(R"(c:\)"s,
