@@ -78,10 +78,10 @@ requires((std::is_convertible_v<std::string_view, std::decay_t<T>>)&&...)
  * Remove c:\ drive letter from start of file.
  * @param input path string
  */
-static void
+inline void
   remove_drive_letter(std::string &input)
 {
-  constexpr static auto letters =
+  constexpr inline auto letters =
     std::string_view("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
   if (std::ranges::size(input) >= 3 && input[1] == ':'
       && (input[2] == '\\' || input[2] == '/')
@@ -96,14 +96,14 @@ static void
  * @param input path string
  * @return modified string
  */
-[[nodiscard]] [[maybe_unused]] static std::string
+[[nodiscard]] [[maybe_unused]] inline std::string
   remove_drive_letter(std::string &&input)
 {
   remove_drive_letter(input);
   return std::move(input);
 }
 
-static void
+inline void
   remove_all_drive_letters(std::string &heystack)
 {
   const auto letters =
@@ -119,7 +119,7 @@ static void
     }
   }
 }
-[[nodiscard]] [[maybe_unused]] static std::string
+[[nodiscard]] [[maybe_unused]] inline std::string
   remove_all_drive_letters(std::string &&heystack)
 {
   remove_all_drive_letters(heystack);
@@ -129,7 +129,7 @@ static void
  * Remove the \r from the end of the string
  * @param input
  */
-static void
+inline void
   remove_carriage_return_from_end(std::string &input)
 {
   while (input.back() == '\r') {
@@ -141,7 +141,7 @@ static void
  * Remove the \r from the end of the string
  * @param input
  */
-[[nodiscard]] [[maybe_unused]] static std::string
+[[nodiscard]] [[maybe_unused]] inline std::string
   remove_carriage_return_from_end(std::string &&input)
 {
   remove_carriage_return_from_end(input);
@@ -151,7 +151,7 @@ static void
  * Remove the \r from the any part of the string
  * @param input
  */
-static void
+inline void
   remove_carriage_return(std::string &input)
 {
   std::erase(input, '\r');
@@ -160,7 +160,7 @@ static void
  * Remove the \r from the any part of the string
  * @param input
  */
-[[nodiscard]] [[maybe_unused]] static std::string
+[[nodiscard]] [[maybe_unused]] inline std::string
   remove_carriage_return(std::string &&input)
 {
   remove_carriage_return(input);
@@ -171,7 +171,7 @@ static void
  * replace all slashes with the os's slashes.
  * @param haystack string with slashes
  */
-[[maybe_unused]] static void
+[[maybe_unused]] inline void
   replace_slashes(std::string &haystack)
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
@@ -183,7 +183,7 @@ static void
  * replace all slashes with the os's slashes.
  * @param haystack string with slashes
  */
-[[maybe_unused]] static std::string
+[[maybe_unused]] inline std::string
   replace_slashes(std::string &&haystack)
 {
   replace_slashes(haystack);
@@ -193,7 +193,7 @@ static void
  * replace all slashes with the \ slashes.
  * @param haystack string with slashes
  */
-[[maybe_unused]] static void
+[[maybe_unused]] inline void
   undo_replace_slashes(std::string &haystack)
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
@@ -205,7 +205,7 @@ static void
  * replace all slashes with the \ slashes.
  * @param haystack string with slashes
  */
-[[maybe_unused]] static std::string
+[[maybe_unused]] inline std::string
   undo_replace_slashes(std::string &&haystack)
 {
   undo_replace_slashes(haystack);

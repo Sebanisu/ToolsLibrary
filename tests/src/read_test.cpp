@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <sstream>
 #include <string_view>
-static std::optional<std::filesystem::path>
+inline std::optional<std::filesystem::path>
   create_temp_file()
 {
   using namespace std::string_view_literals;

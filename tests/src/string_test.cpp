@@ -24,9 +24,9 @@ int
         const auto test_drive_letters = [&test_drive_letter](auto &&...start) {
           (test_drive_letter(std::move(start)), ...);
         };
-        static constexpr auto all_lowercase_letters =
+        inline constexpr auto all_lowercase_letters =
           tl::utility::sequence<'a', 'z' - 'a'>();
-        static constexpr auto all_UPPERCASE_letters =
+        inline constexpr auto all_UPPERCASE_letters =
           tl::utility::sequence<'A', 'Z' - 'A'>();
         const auto test_all_drive_letters = [&test_drive_letter]() {
           all_lowercase_letters.operator()([&test_drive_letter]<auto I>() {
@@ -51,7 +51,7 @@ int
         test_all_drive_letters();
       };
       "remove carriage returns from end"_test = []() {
-        static constexpr auto seq = tl::utility::sequence<1, 10>();
+        inline constexpr auto seq = tl::utility::sequence<1, 10>();
         seq([]<auto T>() {
           const auto result =
             tl::string::remove_carriage_return_from_end(std::string(T, '\r'));
@@ -59,7 +59,7 @@ int
         });
       };
       "remove carriage returns from anywhere"_test = []() {
-        static constexpr auto seq = tl::utility::sequence<1, 10>();
+        inline constexpr auto seq = tl::utility::sequence<1, 10>();
         seq([]<auto I>() {
           const auto result =
             tl::string::remove_carriage_return([]() -> std::string {
