@@ -33,6 +33,7 @@ function(set_project_warnings project_name)
             /w14928 # illegal copy-initialization; more than one user-defined conversion has been implicitly applied
             /permissive- # standards conformance mode for MSVC compiler.
             #/wd4505 # suppress unreferenced local function has been removed.
+            /wd7576: suppress shadows a template parameter
             )
 
     set(CLANG_WARNINGS
