@@ -10,7 +10,7 @@ int
   using namespace boost::ut;
   using namespace std::string_view_literals;
   using namespace std::string_literals;
-  [[maybe_unused]] suite sequence = [] {
+  suite sequence = [] {
     "create random char array"_test = [] {
       auto s = tl::utility::sequence<0, 10>();
       s([]<auto I>() {

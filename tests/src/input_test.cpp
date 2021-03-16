@@ -9,7 +9,7 @@ int
   using namespace boost::ut::literals;
   using namespace boost::ut::operators::terse;
   using namespace boost::ut;
-  [[maybe_unused]] suite input = [] {
+  suite input = [] {
     {
       inline constexpr auto buffer = std::string_view("\x01\x00\x00\x00", 4U);
       inline constexpr auto longer_buffer = std::string_view(
@@ -479,7 +479,7 @@ g:\nine\ten)");
             break;
           }
           line_total += 1U;
-          if(input.tell() != line_total-1) {// the last one will be true
+          if (input.tell() != line_total - 1) {// the last one will be true
             expect(eq(input.tell(), line_total));
           }
         }

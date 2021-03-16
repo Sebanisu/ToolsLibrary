@@ -217,7 +217,8 @@ public:
     return outvar;
   }
   template<concepts::is_trivially_copyable_and_default_constructible... outvarT>
-  requires(sizeof...(outvarT) > 1) [[nodiscard]] std::tuple<outvarT...> output() const
+  requires(sizeof...(outvarT) > 1)
+    [[nodiscard]] std::tuple<outvarT...> output() const
   {
     return std::tuple<outvarT...>{ output<outvarT>()... };
   }
@@ -281,7 +282,7 @@ public:
     using value_type = std::decay_t<typename outvarT::value_type>;
     std::size_t size = bytes_size / sizeof(value_type);
     outvar.resize(size);
-    // [[maybe_unused]] const auto rem = get_remaining();
+    //  const auto rem = get_remaining();
     output(outvar);
     return outvar;
   }

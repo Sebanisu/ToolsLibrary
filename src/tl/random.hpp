@@ -27,7 +27,7 @@ private:
 
 public:
   auto
-    operator()([[maybe_unused]] const T &unused) const
+    operator()(const T &unused) const
   {
     return static_cast<T>(dis(gen));
   }
@@ -43,10 +43,9 @@ requires(std::is_integral_v<
 {
   using T                    = std::decay_t<typename rangeT::value_type>;
   inline const auto random_T = impl<T>();
-  std::ranges::transform(
-    out, std::begin(out), []([[maybe_unused]] const T &unused) -> T {
-      return random_T(unused);
-    });
+  std::ranges::transform(out, std::begin(out), [](const T &unused) -> T {
+    return random_T(unused);
+  });
 }
 /**
  * Get a std::array with random values.

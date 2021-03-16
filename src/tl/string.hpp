@@ -5,7 +5,7 @@
 #include <ranges>
 namespace tl::string {
 
-[[nodiscard]] [[maybe_unused]] auto
+[[nodiscard]] auto
   search(const auto &b1, const auto &e1, const auto &b2, const auto &e2)
 {
   auto f = std::search(b1, e1, b2, e2);
@@ -15,7 +15,7 @@ namespace tl::string {
   return std::optional<decltype(f)>();
 }
 
-[[nodiscard]] [[maybe_unused]] auto
+[[nodiscard]] auto
   search(const auto              b1,
          const std::string &     haystack,
          const std::string_view &needle)
@@ -26,7 +26,7 @@ namespace tl::string {
   return string::search(b1, e1, b2, e2);
 }
 
-[[nodiscard]] [[maybe_unused]] auto
+[[nodiscard]] auto
   search(const std::string &haystack, const std::string_view &needle)
 {
 
@@ -67,7 +67,7 @@ requires(
  */
 template<typename... T>
 requires((std::is_convertible_v<std::string_view, std::decay_t<T>>)&&...)
-  [[nodiscard]] [[maybe_unused]] std::string
+  [[nodiscard]] std::string
   erase_string_from_string(std::string &&haystack, const T &...needle)
 {
   erase_string_from_string(haystack, needle...);
@@ -96,7 +96,7 @@ inline void
  * @param input path string
  * @return modified string
  */
-[[nodiscard]] [[maybe_unused]] inline std::string
+[[nodiscard]] inline std::string
   remove_drive_letter(std::string &&input)
 {
   remove_drive_letter(input);
@@ -119,7 +119,7 @@ inline void
     }
   }
 }
-[[nodiscard]] [[maybe_unused]] inline std::string
+[[nodiscard]] inline std::string
   remove_all_drive_letters(std::string &&heystack)
 {
   remove_all_drive_letters(heystack);
@@ -141,7 +141,7 @@ inline void
  * Remove the \r from the end of the string
  * @param input
  */
-[[nodiscard]] [[maybe_unused]] inline std::string
+[[nodiscard]] inline std::string
   remove_carriage_return_from_end(std::string &&input)
 {
   remove_carriage_return_from_end(input);
@@ -160,7 +160,7 @@ inline void
  * Remove the \r from the any part of the string
  * @param input
  */
-[[nodiscard]] [[maybe_unused]] inline std::string
+[[nodiscard]] inline std::string
   remove_carriage_return(std::string &&input)
 {
   remove_carriage_return(input);
@@ -171,7 +171,7 @@ inline void
  * replace all slashes with the os's slashes.
  * @param haystack string with slashes
  */
-[[maybe_unused]] inline void
+inline void
   replace_slashes(std::string &haystack)
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
@@ -183,7 +183,7 @@ inline void
  * replace all slashes with the os's slashes.
  * @param haystack string with slashes
  */
-[[maybe_unused]] inline std::string
+inline std::string
   replace_slashes(std::string &&haystack)
 {
   replace_slashes(haystack);
@@ -193,7 +193,7 @@ inline void
  * replace all slashes with the \ slashes.
  * @param haystack string with slashes
  */
-[[maybe_unused]] inline void
+inline void
   undo_replace_slashes(std::string &haystack)
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
@@ -205,7 +205,7 @@ inline void
  * replace all slashes with the \ slashes.
  * @param haystack string with slashes
  */
-[[maybe_unused]] inline std::string
+inline std::string
   undo_replace_slashes(std::string &&haystack)
 {
   undo_replace_slashes(haystack);

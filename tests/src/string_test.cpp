@@ -11,7 +11,7 @@ int
   using namespace boost::ut;
   using namespace std::string_view_literals;
   using namespace std::string_literals;
-  [[maybe_unused]] suite string = [] {
+  suite string = [] {
     {
       "remove drive letter"_test = [] {
         const auto test_drive_letter = [](std::string &&start) {
