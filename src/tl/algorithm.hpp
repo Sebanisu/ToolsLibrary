@@ -7,11 +7,17 @@
 #include <ranges>
 namespace tl::algorithm {
 template<typename B1, typename E1, typename... BS, typename OP>
-void
-  for_each(const OP op, B1 b, const E1 e, BS... bs)
+requires requires(OP op, B1 b1, E1 e1,BS...bs)
 {
-  for (; b != e; ++b, (++bs, ...)) {
-    op(*b, *bs...);
+  ++b1, (++bs, ...);
+  op(*b1, *bs...);
+  b1 != e1;
+}
+void
+  for_each(const OP op, B1 b1, const E1 e1, BS... bs)
+{
+  for (; b1 != e1; ++b1, (++bs, ...)) {
+    op(*b1, *bs...);
   }
 }
 template<std::ranges::forward_range R1, std::ranges::forward_range... RS, typename OP>
