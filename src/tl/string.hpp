@@ -116,7 +116,7 @@ void
       std::array<char, 3U> needle = { letter, colon, slash };
       erase_string_from_string(
         heystack,
-        std::string_view(std::begin(needle), std::end(needle)));
+        std::string_view(std::data(needle), std::size(needle)));
     }
   }
 }

@@ -29,5 +29,7 @@ template<typename T> concept is_iterator = requires(T t)
   ++t;
   *t;
 };
+template<typename T>
+concept is_integral = std::is_integral_v<T>;
 }// namespace tl::concepts
 #endif// TOOLSLIBRARY_CONCEPTS_HPP

@@ -14,7 +14,7 @@ namespace tl::random {
  * @see if we can make this passable to a std::transform
  * @todo maybe a form of random_impl should be moved to toolslibrary.
  */
-template<std::integral T> struct impl
+template<tl::concepts::is_integral T> struct impl
 {
 private:
 
@@ -54,7 +54,7 @@ requires(std::is_integral_v<
  * @tparam count is the total number of values in the array.
  * @return std::array<T,count>
  */
-template<std::integral T, std::size_t count>
+template<tl::concepts::is_integral T, std::size_t count>
 auto
   iota()
 {
