@@ -5,25 +5,33 @@
 #ifndef TOOLSLIBRARY_ALGORITHM_HPP
 #define TOOLSLIBRARY_ALGORITHM_HPP
 #include <ranges>
+#include <cassert>
 namespace tl::algorithm {
 template<typename B1, typename E1, typename... BS, typename OP>
-requires requires(OP op, B1 b1, E1 e1,BS...bs)
+requires requires(OP op, B1 b1, E1 e1, BS... bs)
 {
   ++b1, (++bs, ...);
   op(*b1, *bs...);
   b1 != e1;
 }
-void
+constexpr void
   for_each(const OP op, B1 b1, const E1 e1, BS... bs)
 {
   for (; b1 != e1; ++b1, (++bs, ...)) {
     op(*b1, *bs...);
   }
 }
-template<std::ranges::forward_range R1, std::ranges::forward_range... RS, typename OP>
-void
+template<std::ranges::forward_range R1,
+         std::ranges::forward_range... RS,
+         typename OP>
+constexpr void
   for_each(const OP op, const R1 &r1, const RS &...rs)
 {
+  if (std::is_constant_evaluated() && ((std::ranges::size(r1) != std::ranges::size(rs)) || ...)) {
+    throw;
+  } else {
+    assert(((std::ranges::size(r1) == std::ranges::size(rs)) && ...));
+  }
   for_each(op,
            std::ranges::cbegin(r1),
            std::ranges::cend(r1),
