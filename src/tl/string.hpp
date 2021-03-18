@@ -1,8 +1,9 @@
 #ifndef TOOLSLIBRARY_STRING_HPP
 #define TOOLSLIBRARY_STRING_HPP
-#include <algorithm>
+#include "algorithm.hpp"
 #include <filesystem>
-#include <ranges>
+#include <optional>
+
 namespace tl::string {
 
 [[nodiscard]] auto
@@ -20,9 +21,9 @@ namespace tl::string {
          const std::string &     haystack,
          const std::string_view &needle)
 {
-  const auto e1 = std::ranges::end(haystack);
-  const auto b2 = std::ranges::begin(needle);
-  const auto e2 = std::ranges::end(needle);
+  const auto e1 = std::end(haystack);
+  const auto b2 = std::begin(needle);
+  const auto e2 = std::end(needle);
   return string::search(b1, e1, b2, e2);
 }
 
@@ -30,7 +31,7 @@ namespace tl::string {
   search(const std::string &haystack, const std::string_view &needle)
 {
 
-  const auto b1 = std::ranges::begin(haystack);
+  const auto b1 = std::begin(haystack);
   return string::search(b1, haystack, needle);
 }
 
@@ -52,7 +53,7 @@ requires(
       for (auto f = search(haystack, n); f.has_value();
            f      = search(f.value(), haystack, n)) {
         haystack.erase(f.value(),
-                       f.value() + static_cast<long>(std::ranges::size(n)));
+                       f.value() + static_cast<long>(std::size(n)));
       }
     }(needle),
     ...);
@@ -83,9 +84,9 @@ void
 {
   constexpr static auto letters =
     std::string_view("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-  if (std::ranges::size(input) >= 3 && input[1] == ':'
+  if (std::size(input) >= 3 && input[1] == ':'
       && (input[2] == '\\' || input[2] == '/')
-      && std::ranges::any_of(letters, [&input](const char &c) {
+      && tl::algorithm::any_of(letters, [&input](const char &c) {
            return input[0] == c;
          })) {
     input.erase(0, 3);// remove c:\ from the start of the strings.
@@ -115,7 +116,7 @@ void
       std::array<char, 3U> needle = { letter, colon, slash };
       erase_string_from_string(
         heystack,
-        std::string_view(std::ranges::begin(needle), std::ranges::end(needle)));
+        std::string_view(std::begin(needle), std::end(needle)));
     }
   }
 }
@@ -132,7 +133,7 @@ void
 void
   remove_carriage_return_from_end(std::string &input)
 {
-  while (!std::ranges::empty(input) && input.back() == '\r') {
+  while (!std::empty(input) && input.back() == '\r') {
     input.pop_back();
   }
 }
@@ -175,8 +176,8 @@ void
   replace_slashes(std::string &haystack)
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
-    std::ranges::replace(
-      haystack, '\\', std::filesystem::path::preferred_separator);
+    tl::algorithm::replace(
+      haystack, '\\', static_cast<char>(std::filesystem::path::preferred_separator));
   }
 }
 /**
@@ -197,8 +198,8 @@ void
   undo_replace_slashes(std::string &haystack)
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
-    std::ranges::replace(
-      haystack, std::filesystem::path::preferred_separator, '\\');
+    tl::algorithm::replace(
+      haystack, static_cast<char>(std::filesystem::path::preferred_separator), '\\');
   }
 }
 /**

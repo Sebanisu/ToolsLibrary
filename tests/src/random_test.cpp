@@ -1,6 +1,7 @@
 #include <boost/ut.hpp>// single header
 // import boost.ut;        // single module (C++20)
 #include "tl/random.hpp"
+#include "tl/algorithm.hpp"
 #include <string_view>
 int
   main()
@@ -13,7 +14,7 @@ int
   [[maybe_unused]] suite random = [] {
     const auto check_type = []<std::integral integralT>() {
       const auto random_values = tl::random::iota<char, 10U>();
-      expect(std::ranges::any_of(random_values, [](const auto &value) -> bool {
+      expect(tl::algorithm::any_of(random_values, [](const auto &value) -> bool {
         return value != integralT{};
       }));
     };
