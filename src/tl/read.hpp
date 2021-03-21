@@ -52,9 +52,9 @@ namespace tl::read {
  * @return true if open and lambda was executed.
  * @todo test?
  */
-template<typename lambdaT>
-requires(std::invocable<lambdaT, std::istream &>) bool from_file(
-  const lambdaT &lambda, const std::filesystem::path &path)
+template<tl::concepts::is_invocable<std::istream &> lambdaT>
+bool
+  from_file(const lambdaT &lambda, const std::filesystem::path &path)
 {
   auto ofp = open_file(path);
   if (ofp.has_value() && ofp->is_open()) {// check might be redundant.
