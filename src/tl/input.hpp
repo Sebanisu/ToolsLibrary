@@ -286,7 +286,7 @@ public:
     output(outvar);
     return outvar;
   }
-  template<std::signed_integral signedT>
+  template<tl::concepts::is_signed_integral signedT>
   const input &
     seek(const signedT &bytes_size, const std::ios_base::seekdir &from) const
   {

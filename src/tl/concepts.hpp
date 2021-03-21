@@ -31,5 +31,8 @@ template<typename T> concept is_iterator = requires(T t)
 };
 template<typename T>
 concept is_integral = std::is_integral_v<T>;
+
+template<typename T>
+concept is_signed_integral = is_integral<T> && std::is_signed_v<T>;
 }// namespace tl::concepts
 #endif// TOOLSLIBRARY_CONCEPTS_HPP
