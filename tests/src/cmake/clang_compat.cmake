@@ -7,3 +7,6 @@ function(set_clang_compat project_name)
     else ()
     endif ()
 endfunction()
+
+add_library(${PROJECT_NAME}_clang_compat INTERFACE)
+set_clang_compat(${PROJECT_NAME}_clang_compat)
