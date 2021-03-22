@@ -4,7 +4,7 @@
 #include <fstream>
 #include <istream>
 #include <optional>
-#include <ranges>
+
 #include <span>
 namespace tl::utility {
 /**
@@ -14,7 +14,7 @@ namespace tl::utility {
 [[nodiscard]] auto
   get_remaining(const std::span<const char> in)
 {
-  return std::ranges::size(in);
+  return std::size(in);
 }
 /**
  * Get remaining amount of bytes in a std::istream.

@@ -15,9 +15,9 @@ int
     {
       "remove drive letter"_test = [] {
         const auto test_drive_letter = [](std::string &&start) {
-          const auto start_size = std::ranges::size(start);
+          const auto start_size = std::size(start);
           const auto end = tl::string::remove_drive_letter(std::move(start));
-          const auto end_size = std::ranges::size(end);
+          const auto end_size = std::size(end);
           expect(gt(start_size, end_size));
           expect(eq(start_size - 3U, end_size));
         };
@@ -55,7 +55,7 @@ int
         seq([]<auto T>() {
           const auto result =
             tl::string::remove_carriage_return_from_end(std::string(T, '\r'));
-          expect(std::ranges::empty(result));
+          expect(std::empty(result));
         });
       };
       "remove carriage returns from anywhere"_test = []() {
@@ -72,7 +72,7 @@ int
               }
               return r_string;
             }());
-          expect(eq(std::ranges::size(result), 2U * I5));
+          expect(eq(std::size(result), 2U * I5));
         });
       };
       if constexpr (std::filesystem::path::preferred_separator == '/') {
@@ -103,7 +103,7 @@ c:\test6\test7)"s,
     "remove all drive letters"_test = [] {
       const auto value = tl::string::remove_all_drive_letters(
         R"(a:\b:\c:\d:\e:\f:\g:\h:\i:\j:\k:\l:\m:\n:\o:\p:\q:\r:\s:\t:\u:\v:\w:\x:\y:\z:\a:/b:/c:/d:/e:/f:/g:/h:/i:/j:/k:/l:/m:/n:/o:/p:/q:/r:/s:/t:/u:/v:/w:/x:/y:/z:/)"s);
-      expect(std::ranges::empty(value));
+      expect(std::empty(value));
     };
   };
 }

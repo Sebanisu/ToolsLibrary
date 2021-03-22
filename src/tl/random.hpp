@@ -4,9 +4,9 @@
 #ifndef TOOLSLIBRARY_RANDOM_HPP
 #define TOOLSLIBRARY_RANDOM_HPP
 #include "tl/concepts.hpp"
-#include <algorithm>
+#include "tl/algorithm.hpp"
 #include <random>
-#include <ranges>
+
 namespace tl::random {
 /**
  * Random holder should be defined as a  value.
@@ -14,7 +14,7 @@ namespace tl::random {
  * @see if we can make this passable to a std::transform
  * @todo maybe a form of random_impl should be moved to toolslibrary.
  */
-template<std::integral T> struct impl
+template<tl::concepts::is_integral T> struct impl
 {
 private:
 
@@ -38,13 +38,13 @@ public:
  * @tparam T type going into range.
  * @param out range
  */
-template<std::ranges::contiguous_range rangeT>
+template<tl::concepts::is_range rangeT>
 requires(std::is_integral_v<
          std::decay_t<typename rangeT::value_type>>) void iota(rangeT &out)
 {
   using T                    = std::decay_t<typename rangeT::value_type>;
   static const auto random_T = impl<T>();
-  std::ranges::transform(out, std::begin(out), [](const T &unused) -> T {
+  tl::algorithm::transform(out, std::begin(out), [](const T &unused) -> T {
     return random_T(unused);
   });
 }
@@ -54,7 +54,7 @@ requires(std::is_integral_v<
  * @tparam count is the total number of values in the array.
  * @return std::array<T,count>
  */
-template<std::integral T, std::size_t count>
+template<tl::concepts::is_integral T, std::size_t count>
 auto
   iota()
 {

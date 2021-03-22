@@ -30,7 +30,7 @@ namespace tl::read {
     return ofp;
   }
   ofp.emplace(std::ifstream{});
-  for (;;) {
+  for (std::size_t i = 0; i < 600U; ++i) {
     ofp->open(path, std::ios::in | std::ios::binary);
     if (ofp->is_open()) {
       break;
@@ -40,7 +40,7 @@ namespace tl::read {
     // next time it'd work fine (╯°□°)╯︵ ┻━┻
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
-  std::cout << (std::string("Loading: \t\"") + path.string()
+  std::clog << (std::string("Loading: \t\"") + path.string()
                 + std::string("\"\n"));
   return ofp;
 }
@@ -52,9 +52,9 @@ namespace tl::read {
  * @return true if open and lambda was executed.
  * @todo test?
  */
-template<typename lambdaT>
-requires(std::invocable<lambdaT, std::istream &>) bool from_file(
-  const lambdaT &lambda, const std::filesystem::path &path)
+template<tl::concepts::is_invocable<std::istream &> lambdaT>
+bool
+  from_file(const lambdaT &lambda, const std::filesystem::path &path)
 {
   auto ofp = open_file(path);
   if (ofp.has_value() && ofp->is_open()) {// check might be redundant.

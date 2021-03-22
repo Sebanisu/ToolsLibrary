@@ -48,12 +48,12 @@ int
         },
         temp_file_path.value());
       expect(ret);
-      expect(std::ranges::equal(out, "Hello World"s));
+      expect(tl::algorithm::equal(out, "Hello World"s));
     };
     "read entire file"_test = [&temp_file_path] {
       const auto out =
         tl::read::entire_file(temp_file_path.value(), std::string());
-      expect(std::ranges::equal(out, "Hello World"s));
+      expect(tl::algorithm::equal(out, "Hello World"s));
     };
     "read value from file at offset"_test = [&temp_file_path] {
       const auto out  = tl::read::from_file<char>(3U, temp_file_path.value());
