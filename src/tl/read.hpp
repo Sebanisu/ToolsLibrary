@@ -30,7 +30,7 @@ namespace tl::read {
     return ofp;
   }
   ofp.emplace(std::ifstream{});
-  for (;;) {
+  for (std::size_t i = 0; i < 600U; ++i) {
     ofp->open(path, std::ios::in | std::ios::binary);
     if (ofp->is_open()) {
       break;
@@ -40,7 +40,7 @@ namespace tl::read {
     // next time it'd work fine (╯°□°)╯︵ ┻━┻
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
-  std::cout << (std::string("Loading: \t\"") + path.string()
+  std::clog << (std::string("Loading: \t\"") + path.string()
                 + std::string("\"\n"));
   return ofp;
 }
