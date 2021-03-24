@@ -19,8 +19,12 @@ template<typename T> concept is_range = requires(T t)
 };
 template<typename T> concept is_continuous_range = is_range<T> && requires(T t)
 {
-  std::size(t);
-  std::data(t);
+  //the free function is not global it's defined separately for each container.
+  //so to use it here I need to include each of the containers.
+  //std::size(t);
+  t.size();
+  //std::data(t);
+  t.data();
 };
 template<typename T>
 concept is_contiguous_and_resizable = is_continuous_range<T> &&is_resizable<T>;
