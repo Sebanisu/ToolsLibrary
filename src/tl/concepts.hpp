@@ -14,16 +14,18 @@ template<typename T> concept is_resizable = requires(T t)
 
 template<typename T> concept is_range = requires(T t)
 {
-  std::begin(t);
-  std::end(t);
+  // std::begin(t);
+  t.begin();
+  // std::end(t);
+  t.end();
 };
-template<typename T> concept is_continuous_range = is_range<T> && requires(T t)
+template<typename T> concept is_continuous_range = is_range<T> &&requires(T t)
 {
-  //the free function is not global it's defined separately for each container.
-  //so to use it here I need to include each of the containers.
-  //std::size(t);
+  // the free function is not global it's defined separately for each container.
+  // so to use it here I need to include each of the containers.
+  // std::size(t);
   t.size();
-  //std::data(t);
+  // std::data(t);
   t.data();
 };
 template<typename T>
@@ -33,13 +35,11 @@ template<typename T> concept is_iterator = requires(T t)
   ++t;
   *t;
 };
-template<typename T>
-concept is_integral = std::is_integral_v<T>;
+template<typename T> concept is_integral = std::is_integral_v<T>;
 
 template<typename T>
-concept is_signed_integral = is_integral<T> && std::is_signed_v<T>;
+concept is_signed_integral = is_integral<T> &&std::is_signed_v<T>;
 
-template<typename...T>
-concept is_invocable = std::is_invocable_v<T...>;
+template<typename... T> concept is_invocable = std::is_invocable_v<T...>;
 }// namespace tl::concepts
 #endif// TOOLSLIBRARY_CONCEPTS_HPP
