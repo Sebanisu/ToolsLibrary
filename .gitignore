@@ -41,6 +41,4 @@ out/*
 cmake-build-*/*
 #ninja
 build/*
-reduce/random_test-7f79f0.cpp
-random_test-7f79f0.cpp.orig
-reduce/random_test-7f79f0.sh
+reduce/*

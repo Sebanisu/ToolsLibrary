@@ -3,8 +3,8 @@
 //
 #ifndef TOOLSLIBRARY_RANDOM_HPP
 #define TOOLSLIBRARY_RANDOM_HPP
-#include "tl/concepts.hpp"
 #include "tl/algorithm.hpp"
+#include "tl/concepts.hpp"
 #include <random>
 
 namespace tl::random {
@@ -12,15 +12,13 @@ namespace tl::random {
  * Random holder should be defined as a  value.
  * @tparam T type of value returned by operator()
  * @see if we can make this passable to a std::transform
- * @todo maybe a form of random_impl should be moved to toolslibrary.
  */
 template<tl::concepts::is_integral T> struct impl
 {
 private:
-
-    using unsigned_t = std::make_unsigned_t<T>;
-  std::random_device                                             rd{};
-  mutable std::mt19937                                           gen{ rd() };
+  using unsigned_t = std::make_unsigned_t<T>;
+  std::random_device                                 rd{};
+  mutable std::mt19937                               gen{ rd() };
   mutable std::uniform_int_distribution<std::size_t> dis{
     std::numeric_limits<unsigned_t>::min(),
     std::numeric_limits<unsigned_t>::max()
