@@ -1,8 +1,8 @@
 #ifndef TOOLSLIBRARY_INPUT_HPP
 #define TOOLSLIBRARY_INPUT_HPP
+#include "tl/algorithm.hpp"
 #include "tl/concepts.hpp"
 #include "tl/utility.hpp"
-#include "tl/algorithm.hpp"
 #include <cassert>
 #include <cstdint>
 #include <cstring>
@@ -45,30 +45,34 @@ private:
    */
   template<concepts::is_trivially_copyable outvarT>
   void
-    copy(outvarT *const                 outvar,
-         const tl::concepts::is_range auto &in,
-         const std::size_t              bytes = sizeof(outvarT)) const
+    copy(outvarT *const    outvar,
+         const char *const in,
+         const std::size_t bytes = sizeof(outvarT)) const
   {
     assert(outvar != nullptr);
-    assert(std::data(in) != nullptr);
-    memcpy(outvar, std::data(in), bytes);
+    assert(in != nullptr);
+    memcpy(outvar, in, bytes);
   }
   template<concepts::is_trivially_copyable outvarT>
   void
     output_span_ptr(outvarT &outvar) const
   {
     auto &in = *std::get<0>(m_input);
-    copy(&outvar, in);
+    if (m_safe && sizeof(outvarT) > get_remaining())
+      return;
+    copy(&outvar, std::data(in));
     in = in.subspan(sizeof(outvar));
   }
   template<concepts::is_trivially_copyable outvarT>
   void
     output_stream(outvarT &outvar) const
   {
-    auto &                           in = *std::get<1>(m_input);
+    auto &in = *std::get<1>(m_input);
+    if (m_safe && sizeof(outvarT) > get_remaining())
+      return;
     std::array<char, sizeof(outvar)> tmp{};
     in.read(std::data(tmp), sizeof(outvar));
-    copy(&outvar, tmp);
+    copy(&outvar, std::data(tmp));
   }
   [[nodiscard]] std::size_t
     get_remaining() const
@@ -104,8 +108,8 @@ private:
     assert(m_tmp_span_data != nullptr);
     auto &     in    = *std::get<0>(m_input);
     const auto reset = [&in, this]() {
-      const auto offset = static_cast<std::size_t>(
-        std::distance(m_tmp_span_data, std::data(in)));
+      const auto offset =
+        static_cast<std::size_t>(std::distance(m_tmp_span_data, std::data(in)));
       if (offset > 0U) {
         const auto size = offset + std::size(in);
         in              = std::span<const char>(m_tmp_span_data, size);
@@ -149,7 +153,7 @@ private:
              || (from == std::ios::beg && bytes_size < 0)));
     if (from == std::ios::beg) {
       in.clear();// If you read to end fail bit gets set. This will unset it
-                 // when you seek from begin.
+      // when you seek from begin.
     }
     in.seekg(bytes_size, from);
     return *this;
@@ -159,24 +163,45 @@ private:
     output_span(outvarT &outvar, size_t size) const
   {
     auto &in = *std::get<0>(m_input);
-    copy(std::data(outvar), in, size);
+    if (size == 0 || (m_safe && size > get_remaining()))
+      return;
+    copy(std::data(outvar), std::data(in), size);
     in = in.subspan(size);
   }
   template<concepts::is_contiguous_and_resizable outvarT>
   void
     output_istream(outvarT &outvar, size_t size) const
   {
-    auto &            in = *std::get<1>(m_input);
+    auto &in = *std::get<1>(m_input);
+    if (size == 0 || (m_safe && size > get_remaining()))
+      return;
     std::vector<char> tmp(size);
     in.read(std::data(tmp), static_cast<long>(size));
-    copy(std::data(outvar), tmp, size);
+    copy(std::data(outvar), std::data(tmp), size);
+  }
+
+  void
+    get_line_span(std::string &return_value) const
+  {
+    const auto f             = tl::algorithm::find(*std::get<0>(m_input), '\n');
+    const auto b             = std::begin(*std::get<0>(m_input));
+    const auto e             = std::end(*std::get<0>(m_input));
+    const auto get_line_span = [&return_value, this](const auto &first,
+                                                     const auto &last,
+                                                     const int   offset = 0) {
+      return_value.insert(std::begin(return_value), first, last);
+      seek(std::distance(first, last) + offset, std::ios::cur);
+    };
+    if (f != e) {
+      get_line_span(b, f, 1);
+    } else if (b != e) {
+      get_line_span(b, e);
+    }
   }
 
 public:
   explicit input(std::span<const char> *const in_input, bool in_safe = false)
-    : m_tmp_span_data(std::data(*in_input)),
-      m_input(in_input),
-      m_safe(in_safe)
+    : m_tmp_span_data(std::data(*in_input)), m_input(in_input), m_safe(in_safe)
   {}
   explicit input(std::span<const char> in_input, bool in_safe = false)
     : m_tmp_span(in_input),
@@ -304,8 +329,8 @@ public:
     tell() const
   {
     if (m_input.index() == 0) {
-      return static_cast<std::size_t>(std::distance(
-        m_tmp_span_data, std::data(*std::get<0>(m_input))));
+      return static_cast<std::size_t>(
+        std::distance(m_tmp_span_data, std::data(*std::get<0>(m_input))));
     } else if (m_input.index() == 1) {
       if (!std::get<1>(m_input)->good()) {
         std::get<1>(m_input)->clear();
@@ -320,20 +345,7 @@ public:
   {
     std::string return_value{};
     if (m_input.index() == 0) {
-      const auto f             = tl::algorithm::find(*std::get<0>(m_input), '\n');
-      const auto b             = std::begin(*std::get<0>(m_input));
-      const auto e             = std::end(*std::get<0>(m_input));
-      const auto get_line_span = [&return_value, this](const auto &first,
-                                                       const auto &last,
-                                                       const int   offset = 0) {
-        return_value.insert(std::begin(return_value), first, last);
-        seek(std::distance(first, last) + offset, std::ios::cur);
-      };
-      if (f != e) {
-        get_line_span(b, f, 1);
-      } else if (b != e) {
-        get_line_span(b, e);
-      }
+      get_line_span(return_value);
     } else if (m_input.index() == 1) {
       std::getline(*std::get<1>(m_input), return_value);
     }
