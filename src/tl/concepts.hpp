@@ -1,6 +1,7 @@
 #ifndef TOOLSLIBRARY_CONCEPTS_HPP
 #define TOOLSLIBRARY_CONCEPTS_HPP
 #include <type_traits>
+#include <cstdint>
 namespace tl::concepts {
 template<typename T>
 concept is_trivially_copyable = std::is_trivially_copyable_v<T>;
@@ -47,7 +48,7 @@ concept is_contiguous_with_insert =
   concepts::is_continuous_range<R> &&requires(R r, R r2, T t)
 {
   r.insert(r.begin(), t);
-  r.insert(r.begin(), size_t(2U), t);
+  r.insert(r.begin(), std::size_t(2U), t);
   r.insert(r.begin(), r2.begin(), r2.end());
 };
 }// namespace tl::concepts
