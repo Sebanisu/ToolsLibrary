@@ -26,9 +26,9 @@ requires(
   !std::is_same_v<
     outputT,
     inputT> && std::is_same_v<outputT, char> && concepts::is_trivially_copyable<inputT>) void append(outputR
-                                                                                                        &out,
-                                                                                                      const inputR
-                                                                                                        &in)
+                                                                                                       &out,
+                                                                                                     const inputR
+                                                                                                       &in)
 {
   auto tmp = utility::to_bytes<inputT>(std::data(in), std::size(in));
   append(out, tmp);

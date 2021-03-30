@@ -1,13 +1,15 @@
 #ifndef TOOLSLIBRARY_UTILITY_HPP
 #define TOOLSLIBRARY_UTILITY_HPP
+#include "tl/concepts.hpp"
+#include <array>
+#include <cassert>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <istream>
 #include <optional>
-#include <cstring>
-#include <vector>
-#include <array>
 #include <span>
+#include <vector>
 
 namespace tl::utility {
 /**
@@ -21,10 +23,11 @@ namespace tl::utility {
  * @return array of bytes
  */
 template<concepts::is_trivially_copyable T>
-std::array<char, sizeof(T)> to_bytes(const T & in)
+std::array<char, sizeof(T)>
+  to_bytes(const T &in)
 {
-  //todo std::bit_cast will be able to make this function constexpr
-  //todo this is only in gcc trunk and msvc right now.
+  // todo std::bit_cast will be able to make this function constexpr
+  // todo this is only in gcc trunk and msvc right now.
   auto tmp = std::array<char, sizeof(T)>{};
   std::memcpy(std::data(tmp), &in, std::size(tmp));
   return tmp;
@@ -37,7 +40,8 @@ std::array<char, sizeof(T)> to_bytes(const T & in)
  * @return vector of bytes
  */
 template<concepts::is_trivially_copyable T>
-std::vector<char> to_bytes(const T * const in, std::size_t count = 1)
+std::vector<char>
+  to_bytes(const T *const in, std::size_t count = 1)
 {
   assert(count != 0);
   auto tmp = std::vector<char>(count * sizeof(T));

@@ -52,8 +52,7 @@ requires(
     [&haystack](const std::string_view &n) {
       for (auto f = search(haystack, n); f.has_value();
            f      = search(f.value(), haystack, n)) {
-        haystack.erase(f.value(),
-                       f.value() + static_cast<long>(std::size(n)));
+        haystack.erase(f.value(), f.value() + static_cast<long>(std::size(n)));
       }
     }(needle),
     ...);
@@ -115,8 +114,7 @@ void
     for (const auto slash : slashes) {
       std::array<char, 3U> needle = { letter, colon, slash };
       erase_string_from_string(
-        heystack,
-        std::string_view(std::data(needle), std::size(needle)));
+        heystack, std::string_view(std::data(needle), std::size(needle)));
     }
   }
 }
@@ -177,7 +175,9 @@ void
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
     tl::algorithm::replace(
-      haystack, '\\', static_cast<char>(std::filesystem::path::preferred_separator));
+      haystack,
+      '\\',
+      static_cast<char>(std::filesystem::path::preferred_separator));
   }
 }
 /**
@@ -199,7 +199,9 @@ void
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
     tl::algorithm::replace(
-      haystack, static_cast<char>(std::filesystem::path::preferred_separator), '\\');
+      haystack,
+      static_cast<char>(std::filesystem::path::preferred_separator),
+      '\\');
   }
 }
 /**

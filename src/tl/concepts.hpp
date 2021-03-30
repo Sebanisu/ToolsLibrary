@@ -43,9 +43,8 @@ concept is_signed_integral = is_integral<T> &&std::is_signed_v<T>;
 template<typename... T> concept is_invocable = std::is_invocable_v<T...>;
 
 template<typename R, typename T = std::decay_t<typename R::value_type>>
-concept is_contiguous_with_insert = concepts::is_continuous_range<R> &&requires(R r,
-                                                                        R r2,
-                                                                        T t)
+concept is_contiguous_with_insert =
+  concepts::is_continuous_range<R> &&requires(R r, R r2, T t)
 {
   r.insert(r.begin(), t);
   r.insert(r.begin(), size_t(2U), t);
