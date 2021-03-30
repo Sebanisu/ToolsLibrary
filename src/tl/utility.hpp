@@ -1,12 +1,53 @@
 #ifndef TOOLSLIBRARY_UTILITY_HPP
 #define TOOLSLIBRARY_UTILITY_HPP
+#include "tl/concepts.hpp"
+#include <array>
+#include <cassert>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <istream>
 #include <optional>
-
 #include <span>
+#include <vector>
+
 namespace tl::utility {
+/**
+ * Utility functions used by the rest of the library
+ */
+
+/**
+ * Convert Type to bytes array
+ * @tparam T Trivially copyable value type
+ * @param in Trivially copyable value
+ * @return array of bytes
+ */
+template<concepts::is_trivially_copyable T>
+std::array<char, sizeof(T)>
+  to_bytes(const T &in)
+{
+  // todo std::bit_cast will be able to make this function constexpr
+  // todo this is only in gcc trunk and msvc right now.
+  auto tmp = std::array<char, sizeof(T)>{};
+  std::memcpy(std::data(tmp), &in, std::size(tmp));
+  return tmp;
+}
+/**
+ * Convert Type to bytes vector
+ * @tparam T Trivially copyable value type
+ * @param in Trivially copyable value source pointer
+ * @param count number of elements from source pointer.
+ * @return vector of bytes
+ */
+template<concepts::is_trivially_copyable T>
+std::vector<char>
+  to_bytes(const T *const in, std::size_t count = 1)
+{
+  assert(count != 0);
+  auto tmp = std::vector<char>(count * sizeof(T));
+  std::memcpy(std::data(tmp), in, std::size(tmp));
+  return tmp;
+}
 /**
  * Get remaining amount of bytes in a std::span.
  * @param in span
