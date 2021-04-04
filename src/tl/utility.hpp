@@ -71,6 +71,24 @@ std::vector<char>
   return static_cast<std::size_t>(end - current);
 }
 /**
+ * Get amount of bytes in a std::span.
+ * @param in span
+ */
+[[nodiscard]] auto
+get_position(const std::span<const char> in)
+{
+  return std::size(in);
+}
+/**
+ * Get position in a std::ostream.
+ * @param in stream
+ */
+[[nodiscard]] auto
+get_position(std::ostream &in)
+{
+  return in.tellp();
+}
+/**
  * Create a temp file filled with data you want.
  * @param file_name desired filename
  * @param data data you want wrote to the file.
