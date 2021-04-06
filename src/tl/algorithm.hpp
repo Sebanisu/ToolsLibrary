@@ -8,6 +8,7 @@
 #include "concepts.hpp"
 #include <algorithm>
 #include <cassert>
+#include <numeric>
 namespace tl::algorithm {
 template<tl::concepts::is_iterator B1,
          tl::concepts::is_iterator E1,
@@ -86,6 +87,17 @@ constexpr bool
 {
   return std::equal(
     std::cbegin(r1), std::cend(r1), std::cbegin(r2), std::cend(r2));
+}
+template<tl::concepts::is_range rangeT,
+         typename transform_opT,
+         typename combine_opT>
+constexpr auto
+  transform_reduce(const rangeT &       range,
+                   const transform_opT &transform_op,
+                   const combine_opT &  combine_op)
+{
+  return std::transform_reduce(
+    std::cbegin(range), std::cend(range), transform_op, combine_op);
 }
 }// namespace tl::algorithm
 #endif// TOOLSLIBRARY_ALGORITHM_HPP
