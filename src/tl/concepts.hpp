@@ -1,7 +1,7 @@
 #ifndef TOOLSLIBRARY_CONCEPTS_HPP
 #define TOOLSLIBRARY_CONCEPTS_HPP
-#include <type_traits>
 #include <cstdint>
+#include <type_traits>
 namespace tl::concepts {
 template<typename T>
 concept is_trivially_copyable = std::is_trivially_copyable_v<T>;
@@ -51,5 +51,16 @@ concept is_contiguous_with_insert =
   r.insert(r.begin(), std::size_t(2U), t);
   r.insert(r.begin(), r2.begin(), r2.end());
 };
+template<typename T>
+concept is_nontrivial_continuous_range =
+  !is_trivially_copyable<T> && is_continuous_range<T>;
+template<typename T>
+concept is_trivial_or_continuous_range =
+  is_nontrivial_continuous_range<
+    T> || is_trivially_copyable<T>;
+template<typename... outvarT>
+concept size_greater_than_1                        = sizeof...(outvarT) > 1U;
+template<typename... outvarT> concept is_not_empty = sizeof...(outvarT) != 0U;
+template<typename... outvarT> concept is_empty     = !is_not_empty<outvarT...>;
 }// namespace tl::concepts
 #endif// TOOLSLIBRARY_CONCEPTS_HPP

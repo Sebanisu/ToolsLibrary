@@ -158,7 +158,7 @@ private:
     in.seekg(bytes_size, from);
     return *this;
   }
-  template<concepts::is_contiguous_and_resizable outvarT>
+  template<concepts::is_nontrivial_continuous_range outvarT>
   void
     output_span(outvarT &outvar, size_t size) const
   {
@@ -168,7 +168,7 @@ private:
     copy(std::data(outvar), std::data(in), size);
     in = in.subspan(size);
   }
-  template<concepts::is_contiguous_and_resizable outvarT>
+  template<concepts::is_nontrivial_continuous_range outvarT>
   void
     output_istream(outvarT &outvar, size_t size) const
   {
@@ -228,11 +228,6 @@ public:
     }
     throw;
   }
-  template<concepts::is_trivially_copyable... outvarT>
-  requires(sizeof...(outvarT) > 1) void output(outvarT &...outvar) const
-  {
-    (output(outvar), ...);
-  }
   template<concepts::is_trivially_copyable_and_default_constructible outvarT>
   outvarT
     output() const
@@ -242,12 +237,31 @@ public:
     return outvar;
   }
   template<concepts::is_trivially_copyable_and_default_constructible... outvarT>
-  requires(sizeof...(outvarT) > 1)
+  requires(concepts::size_greater_than_1<outvarT...>)
     [[nodiscard]] std::tuple<outvarT...> output() const
   {
-    return std::tuple<outvarT...>{ output<outvarT>()... };
+    std::tuple<outvarT...> tmp{};
+    std::apply(
+      [this](outvarT &...out) {
+        output<outvarT...>(out...);
+      },
+      tmp);
+    return tmp;
   }
-  template<concepts::is_contiguous_and_resizable outvarT>
+  template<typename... outvarT>
+  requires(concepts::size_greater_than_1<outvarT...>
+           && (concepts::is_trivial_or_continuous_range<outvarT>, ...))
+    [[nodiscard]] std::tuple<outvarT...> output(outvarT &&...constructed) const
+  {
+    std::tuple<outvarT...> tmp{ std::forward(constructed)... };
+    std::apply(
+      [this](outvarT &...out) {
+        output<outvarT...>(out...);
+      },
+      tmp);
+    return tmp;
+  }
+  template<concepts::is_nontrivial_continuous_range outvarT>
   void
     output(outvarT &outvar) const
   {
@@ -265,24 +279,26 @@ public:
     }
     throw;
   }
-  template<concepts::is_contiguous_and_resizable... outvarT>
-  requires(sizeof...(outvarT) > 1) void output(outvarT &...outvar) const
+  template<typename... outvarT>
+  requires(concepts::size_greater_than_1<outvarT...> && (concepts::is_trivial_or_continuous_range<outvarT>,
+               ...)) void output(outvarT &...outvar) const
   {
     (output(outvar), ...);
   }
-  template<concepts::is_contiguous_and_resizable outvarT>
+  template<concepts::is_nontrivial_continuous_range outvarT>
   requires(!std::is_reference_v<outvarT>) [[nodiscard]] outvarT
     output(outvarT &&outvar) const
   {
     output(outvar);
     return std::move(outvar);
   }
-  template<concepts::is_contiguous_and_resizable... outvarT>
-  requires((sizeof...(outvarT) > 1U) && (!std::is_reference_v<outvarT> && ...))
-    [[nodiscard]] std::tuple<outvarT...> output(outvarT &&...outvar) const
-  {
-    return std::tuple<outvarT...>{ output(std::forward(outvar))... };
-  }
+  //  template<concepts::is_nontrivial_continuous_range... outvarT>
+  //  requires(concepts::is_greater_than_1<outvarT...> && (!std::is_reference_v<outvarT> &&
+  //  ...))
+  //    [[nodiscard]] std::tuple<outvarT...> output(outvarT &&...outvar) const
+  //  {
+  //    return std::tuple<outvarT...>{ output(std::forward(outvar))... };
+  //  }
   template<concepts::is_contiguous_and_resizable outvarT>
   void
     output_all_remaining(outvarT &outvar) const
@@ -292,7 +308,7 @@ public:
     outvar.resize(size);
     output(outvar);
   }
-  template<concepts::is_contiguous_and_resizable outvarT>
+  template<concepts::is_nontrivial_continuous_range outvarT>
   [[nodiscard]] outvarT
     output_all_remaining(outvarT &&outvar) const
   {
