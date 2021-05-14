@@ -167,16 +167,21 @@ void
 }
 
 /**
- * replace all slashes with the os's slashes.
+ * replace all slashes with the preferred_separator.
  * @param haystack string with slashes
  */
-void
+constexpr void
   replace_slashes(std::string &haystack)
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
     tl::algorithm::replace(
       haystack,
       '\\',
+      static_cast<char>(std::filesystem::path::preferred_separator));
+  } else {
+    tl::algorithm::replace(
+      haystack,
+      '/',
       static_cast<char>(std::filesystem::path::preferred_separator));
   }
 }
@@ -191,10 +196,10 @@ std::string
   return std::move(haystack);
 }
 /**
- * replace all slashes with the \ slashes.
+ * replace all slashes with the '\' slashes.
  * @param haystack string with slashes
  */
-void
+constexpr void
   undo_replace_slashes(std::string &haystack)
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
@@ -202,6 +207,11 @@ void
       haystack,
       static_cast<char>(std::filesystem::path::preferred_separator),
       '\\');
+  } else {
+    tl::algorithm::replace(
+      haystack,
+      '/',
+      static_cast<char>(std::filesystem::path::preferred_separator));
   }
 }
 /**
