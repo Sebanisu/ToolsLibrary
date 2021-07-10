@@ -84,7 +84,8 @@ jobs:
         export CC=gcc
         export CXX=g++
         mkdir build
-        cmake -G \"Ninja Multi-Config\" -B build
+        cmake $GITHUB_WORKSPACE -G "Ninja Multi-Config" -B build
+        #cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
         ninja -C build
         #cd build && ctest -C debug --verbose && cd ..
 
