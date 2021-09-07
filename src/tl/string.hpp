@@ -6,7 +6,7 @@
 
 namespace tl::string {
 
-[[nodiscard]] auto
+[[nodiscard]] inline auto
   search(const auto &b1, const auto &e1, const auto &b2, const auto &e2)
 {
   auto f = std::search(b1, e1, b2, e2);
@@ -16,9 +16,9 @@ namespace tl::string {
   return std::optional<decltype(f)>();
 }
 
-[[nodiscard]] auto
+[[nodiscard]] inline auto
   search(const auto              b1,
-         const std::string &     haystack,
+         const std::string      &haystack,
          const std::string_view &needle)
 {
   const auto e1 = std::end(haystack);
@@ -27,7 +27,7 @@ namespace tl::string {
   return string::search(b1, e1, b2, e2);
 }
 
-[[nodiscard]] auto
+[[nodiscard]] inline auto
   search(const std::string &haystack, const std::string_view &needle)
 {
 
@@ -45,8 +45,10 @@ template<typename... T>
 requires(
   (std::is_convertible_v<
     std::string_view,
-    std::decay_t<T>>)&&...) void erase_string_from_string(std::string &haystack,
-                                                          const T &...needle)
+    std::decay_t<T>>)&&...) inline void erase_string_from_string(std::string
+                                                                   &haystack,
+                                                                 const T
+                                                                   &...needle)
 {
   (
     [&haystack](const std::string_view &n) {
@@ -67,7 +69,7 @@ requires(
  */
 template<typename... T>
 requires((std::is_convertible_v<std::string_view, std::decay_t<T>>)&&...)
-  [[nodiscard]] std::string
+  [[nodiscard]] inline std::string
   erase_string_from_string(std::string &&haystack, const T &...needle)
 {
   erase_string_from_string(haystack, needle...);
@@ -78,7 +80,7 @@ requires((std::is_convertible_v<std::string_view, std::decay_t<T>>)&&...)
  * Remove c:\ drive letter from start of file.
  * @param input path string
  */
-void
+inline void
   remove_drive_letter(std::string &input)
 {
   constexpr static auto letters =
@@ -96,14 +98,14 @@ void
  * @param input path string
  * @return modified string
  */
-[[nodiscard]] std::string
+[[nodiscard]] inline std::string
   remove_drive_letter(std::string &&input)
 {
   remove_drive_letter(input);
   return std::move(input);
 }
 
-void
+inline void
   remove_all_drive_letters(std::string &heystack)
 {
   const auto letters =
@@ -118,7 +120,7 @@ void
     }
   }
 }
-[[nodiscard]] std::string
+[[nodiscard]] inline std::string
   remove_all_drive_letters(std::string &&heystack)
 {
   remove_all_drive_letters(heystack);
@@ -128,7 +130,7 @@ void
  * Remove the \r from the end of the string
  * @param input
  */
-void
+inline void
   remove_carriage_return_from_end(std::string &input)
 {
   while (!std::empty(input) && input.back() == '\r') {
@@ -140,7 +142,7 @@ void
  * Remove the \r from the end of the string
  * @param input
  */
-[[nodiscard]] std::string
+[[nodiscard]] inline std::string
   remove_carriage_return_from_end(std::string &&input)
 {
   remove_carriage_return_from_end(input);
@@ -150,7 +152,7 @@ void
  * Remove the \r from the any part of the string
  * @param input
  */
-void
+inline void
   remove_carriage_return(std::string &input)
 {
   std::erase(input, '\r');
@@ -159,7 +161,7 @@ void
  * Remove the \r from the any part of the string
  * @param input
  */
-[[nodiscard]] std::string
+[[nodiscard]] inline std::string
   remove_carriage_return(std::string &&input)
 {
   remove_carriage_return(input);
@@ -170,7 +172,7 @@ void
  * replace all slashes with the preferred_separator.
  * @param haystack string with slashes
  */
-constexpr void
+inline constexpr void
   replace_slashes(std::string &haystack)
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
@@ -189,7 +191,7 @@ constexpr void
  * replace all slashes with the os's slashes.
  * @param haystack string with slashes
  */
-std::string
+inline std::string
   replace_slashes(std::string &&haystack)
 {
   replace_slashes(haystack);
@@ -199,7 +201,7 @@ std::string
  * replace all slashes with the '\' slashes.
  * @param haystack string with slashes
  */
-constexpr void
+inline constexpr void
   undo_replace_slashes(std::string &haystack)
 {
   if constexpr (std::filesystem::path::preferred_separator == '/') {
@@ -218,7 +220,7 @@ constexpr void
  * replace all slashes with the \ slashes.
  * @param haystack string with slashes
  */
-std::string
+[[nodiscard]] inline std::string
   undo_replace_slashes(std::string &&haystack)
 {
   undo_replace_slashes(haystack);

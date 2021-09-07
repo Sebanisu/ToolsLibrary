@@ -16,7 +16,7 @@ namespace tl::read {
  * @return
  * @todo test?
  */
-[[nodiscard]] std::optional<std::ifstream>
+[[nodiscard]] inline std::optional<std::ifstream>
   open_file(const std::filesystem::path &path)
 {
   std::optional<std::ifstream> ofp{};
@@ -71,7 +71,7 @@ bool
  * @param path location on computer where the file is.
  */
 template<concepts::is_trivially_copyable_and_default_constructible outputT>
-[[nodiscard]] outputT
+[[nodiscard]] inline outputT
   from_file(const long &offset, const std::filesystem::path &path)
 {
   outputT output{};
@@ -89,7 +89,7 @@ template<concepts::is_trivially_copyable_and_default_constructible outputT>
  * @param out output range.
  */
 template<concepts::is_contiguous_and_resizable out_rangeT>
-[[nodiscard]] out_rangeT
+[[nodiscard]] inline out_rangeT
   entire_file(std::filesystem::path in_path, out_rangeT &&out)
 {
   from_file(

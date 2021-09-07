@@ -19,7 +19,7 @@ requires requires(OP op, B1 b1, E1 e1, BS... bs)
   op(*b1, *bs...);
   b1 != e1;
 }
-constexpr void
+inline constexpr void
   for_each(const OP op, B1 b1, const E1 e1, BS... bs)
 {
   for (; b1 != e1; ++b1, (++bs, ...)) {
@@ -27,7 +27,7 @@ constexpr void
   }
 }
 template<tl::concepts::is_range R1, tl::concepts::is_range... RS, typename OP>
-constexpr void
+inline constexpr void
   for_each(const OP op, const R1 &r1, const RS &...rs)
 {
   if (std::is_constant_evaluated()
@@ -48,7 +48,7 @@ requires requires(OP op, T t)
 {
   op(t);
 }
-[[nodiscard]] constexpr bool
+[[nodiscard]] inline constexpr bool
   any_of(const R &r, const OP op)
 {
   return std::any_of(std::cbegin(r), std::cend(r), op);
@@ -62,27 +62,27 @@ requires requires(OP op, T t, OI oi)
   *oi = op(t);
   ++oi;
 }
-constexpr auto
+inline constexpr auto
   transform(const R &r, OI oi, const OP op)
 {
   return std::transform(std::cbegin(r), std::cend(r), oi, op);
 }
 template<tl::concepts::is_range R,
          typename T = std::decay_t<typename R::value_type>>
-constexpr void
+inline constexpr void
   replace(R &r, const T &old_value, const T &new_value)
 {
   std::replace(std::begin(r), std::end(r), old_value, new_value);
 }
 template<tl::concepts::is_range R,
          typename T = std::decay_t<typename R::value_type>>
-constexpr auto
+[[nodiscard]] inline constexpr auto
   find(const R &r, const T &value)
 {
   return std::find(std::begin(r), std::end(r), value);
 }
 template<tl::concepts::is_range R1, tl::concepts::is_range R2>
-constexpr bool
+inline constexpr bool
   equal(const R1 &r1, const R2 &r2)
 {
   return std::equal(
@@ -91,10 +91,10 @@ constexpr bool
 template<tl::concepts::is_range rangeT,
          typename transform_opT,
          typename combine_opT>
-constexpr auto
-  transform_reduce(const rangeT &       range,
+[[nodiscard]] inline constexpr auto
+  transform_reduce(const rangeT        &range,
                    const transform_opT &transform_op,
-                   const combine_opT &  combine_op)
+                   const combine_opT   &combine_op)
 {
   return std::transform_reduce(
     std::cbegin(range), std::cend(range), transform_op, combine_op);

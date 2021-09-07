@@ -133,7 +133,7 @@ template<std::size_t... number_sequence> struct sequence_impl
  * @see https://stackoverflow.com/a/49673314/2588183
  */
 template<std::size_t Min, std::size_t I, std::size_t... Ns>
-auto
+inline auto
   make_sequence_impl()
 {
   static_assert(I >= Min);

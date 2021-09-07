@@ -37,8 +37,9 @@ public:
  * @param out range
  */
 template<tl::concepts::is_range rangeT>
-requires(std::is_integral_v<
-         std::decay_t<typename rangeT::value_type>>) void iota(rangeT &out)
+requires(
+  std::is_integral_v<
+    std::decay_t<typename rangeT::value_type>>) inline void iota(rangeT &out)
 {
   using T                    = std::decay_t<typename rangeT::value_type>;
   static const auto random_T = impl<T>();
@@ -53,7 +54,7 @@ requires(std::is_integral_v<
  * @return std::array<T,count>
  */
 template<tl::concepts::is_integral T, std::size_t count>
-auto
+inline auto
   iota()
 {
   static_assert(std::is_integral_v<T>);

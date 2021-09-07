@@ -102,11 +102,11 @@ private:
   }
   template<typename signedT>
   const input &
-    seek_span(const signedT &               bytes_size,
+    seek_span(const signedT                &bytes_size,
               const std::ios_base::seekdir &from) const
   {
     assert(m_tmp_span_data != nullptr);
-    auto &     in    = *std::get<0>(m_input);
+    auto      &in    = *std::get<0>(m_input);
     const auto reset = [&in, this]() {
       const auto offset =
         static_cast<std::size_t>(std::distance(m_tmp_span_data, std::data(in)));
@@ -145,7 +145,7 @@ private:
   }
   template<typename signedT>
   const input &
-    seek_istream(const signedT &               bytes_size,
+    seek_istream(const signedT                &bytes_size,
                  const std::ios_base::seekdir &from) const
   {
     auto &in = *std::get<1>(m_input);
@@ -249,8 +249,9 @@ public:
     return tmp;
   }
   template<typename... outvarT>
-  requires(concepts::size_greater_than_1<outvarT...>
-           && (concepts::is_trivial_or_continuous_range<outvarT>, ...))
+  requires(
+    concepts::size_greater_than_1<
+      outvarT...> && (concepts::is_trivial_or_continuous_range<outvarT>, ...))
     [[nodiscard]] std::tuple<outvarT...> output(outvarT &&...constructed) const
   {
     std::tuple<outvarT...> tmp{ std::forward(constructed)... };
@@ -280,8 +281,11 @@ public:
     throw;
   }
   template<typename... outvarT>
-  requires(concepts::size_greater_than_1<outvarT...> && (concepts::is_trivial_or_continuous_range<outvarT>,
-               ...)) void output(outvarT &...outvar) const
+  requires(
+    concepts::size_greater_than_1<
+      outvarT...> && (concepts::is_trivial_or_continuous_range<outvarT>, ...)) void output(outvarT
+                                                                                             &...outvar)
+    const
   {
     (output(outvar), ...);
   }
@@ -293,7 +297,8 @@ public:
     return std::move(outvar);
   }
   //  template<concepts::is_nontrivial_continuous_range... outvarT>
-  //  requires(concepts::is_greater_than_1<outvarT...> && (!std::is_reference_v<outvarT> &&
+  //  requires(concepts::is_greater_than_1<outvarT...> &&
+  //  (!std::is_reference_v<outvarT> &&
   //  ...))
   //    [[nodiscard]] std::tuple<outvarT...> output(outvarT &&...outvar) const
   //  {
