@@ -23,7 +23,7 @@ namespace tl::utility {
  * @return array of bytes
  */
 template<concepts::is_trivially_copyable T>
-std::array<char, sizeof(T)>
+[[nodiscard]] inline std::array<char, sizeof(T)>
   to_bytes(const T &in)
 {
   // todo std::bit_cast will be able to make this function constexpr
@@ -40,7 +40,7 @@ std::array<char, sizeof(T)>
  * @return vector of bytes
  */
 template<concepts::is_trivially_copyable T>
-std::vector<char>
+[[nodiscard]]inline std::vector<char>
   to_bytes(const T *const in, std::size_t count = 1)
 {
   assert(count != 0);
@@ -52,7 +52,7 @@ std::vector<char>
  * Get remaining amount of bytes in a std::span.
  * @param in span
  */
-[[nodiscard]] auto
+[[nodiscard]] inline auto
   get_remaining(const std::span<const char> in)
 {
   return std::size(in);
@@ -61,7 +61,7 @@ std::vector<char>
  * Get remaining amount of bytes in a std::istream.
  * @param in stream
  */
-[[nodiscard]] auto
+[[nodiscard]]  inline auto
   get_remaining(std::istream &in)
 {
   const auto current = in.tellg();
@@ -74,7 +74,7 @@ std::vector<char>
  * Get amount of bytes in a std::span.
  * @param in span
  */
-[[nodiscard]] auto
+[[nodiscard]] inline  auto
 get_position(const std::span<const char> in)
 {
   return std::size(in);
@@ -83,7 +83,7 @@ get_position(const std::span<const char> in)
  * Get position in a std::ostream.
  * @param in stream
  */
-[[nodiscard]] auto
+[[nodiscard]] inline  auto
 get_position(std::ostream &in)
 {
   return in.tellp();
