@@ -40,7 +40,7 @@ template<concepts::is_trivially_copyable T>
  * @return vector of bytes
  */
 template<concepts::is_trivially_copyable T>
-[[nodiscard]]inline std::vector<char>
+[[nodiscard]] inline std::vector<char>
   to_bytes(const T *const in, std::size_t count = 1)
 {
   assert(count != 0);
@@ -61,7 +61,7 @@ template<concepts::is_trivially_copyable T>
  * Get remaining amount of bytes in a std::istream.
  * @param in stream
  */
-[[nodiscard]]  inline auto
+[[nodiscard]] inline auto
   get_remaining(std::istream &in)
 {
   const auto current = in.tellg();
@@ -74,8 +74,8 @@ template<concepts::is_trivially_copyable T>
  * Get amount of bytes in a std::span.
  * @param in span
  */
-[[nodiscard]] inline  auto
-get_position(const std::span<const char> in)
+[[nodiscard]] inline auto
+  get_position(const std::span<const char> in)
 {
   return std::size(in);
 }
@@ -83,8 +83,8 @@ get_position(const std::span<const char> in)
  * Get position in a std::ostream.
  * @param in stream
  */
-[[nodiscard]] inline  auto
-get_position(std::ostream &in)
+[[nodiscard]] inline auto
+  get_position(std::ostream &in)
 {
   return in.tellp();
 }
@@ -94,9 +94,9 @@ get_position(std::ostream &in)
  * @param data data you want wrote to the file.
  * @return optional path to file
  */
-[[nodiscard]] std::optional<std::filesystem::path>
+[[nodiscard]] inline std::optional<std::filesystem::path>
   create_temp_file(const std::filesystem::path &file_name,
-                   const std::string_view &     data)
+                   const std::string_view      &data)
 {
   using namespace std::string_view_literals;
   std::filesystem::path out_path =
