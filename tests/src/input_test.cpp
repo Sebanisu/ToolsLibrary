@@ -11,7 +11,7 @@ int
   using namespace boost::ut;
   using namespace std::string_view_literals;
   using namespace std::string_literals;
-  [[maybe_unused]] suite input = [] {
+  [[maybe_unused]] suite input_suite = [] {
     {
       static constexpr auto buffer = std::string_view("\x01\x00\x00\x00", 4U);
       static constexpr auto longer_buffer = std::string_view(
