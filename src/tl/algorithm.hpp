@@ -9,16 +9,16 @@
 #include <algorithm>
 #include <cassert>
 #include <numeric>
+#include <ranges>
 namespace tl::algorithm {
 template<tl::concepts::is_iterator B1,
          tl::concepts::is_iterator E1,
          tl::concepts::is_iterator... BS,
          typename OP>
-requires requires(OP op, B1 b1, E1 e1, BS... bs)
-{
-  op(*b1, *bs...);
-  b1 != e1;
-}
+  requires requires(OP op, B1 b1, E1 e1, BS... bs) {
+             op(*b1, *bs...);
+             b1 != e1;
+           }
 inline constexpr void
   for_each(const OP op, B1 b1, const E1 e1, BS... bs)
 {
@@ -44,10 +44,7 @@ inline constexpr void
 template<tl::concepts::is_range R,
          typename OP,
          typename T = std::decay_t<typename R::value_type>>
-requires requires(OP op, T t)
-{
-  op(t);
-}
+  requires requires(OP op, T t) { op(t); }
 [[nodiscard]] inline constexpr bool
   any_of(const R &r, const OP op)
 {
@@ -57,11 +54,10 @@ template<tl::concepts::is_range R,
          typename OI,
          typename OP,
          typename T = std::decay_t<typename R::value_type>>
-requires requires(OP op, T t, OI oi)
-{
-  *oi = op(t);
-  ++oi;
-}
+  requires requires(OP op, T t, OI oi) {
+             *oi = op(t);
+             ++oi;
+           }
 inline constexpr auto
   transform(const R &r, OI oi, const OP op)
 {
