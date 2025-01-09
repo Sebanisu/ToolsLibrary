@@ -1,34 +1,84 @@
 {
-    "version": 8,
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 21,
+        "patch": 0
+    },
     "configurePresets": [
         {
-            "name": "default",
-            "displayName": "Visual Studio Community 2022 Release - amd64",
-            "description": "Using compilers for Visual Studio 17 2022 (x64 architecture)",
+            "name": "base",
+            "hidden": true,
             "generator": "Visual Studio 17 2022",
-            "toolset": "host=x64",
-            "architecture": "x64",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "environment": {
+                "NUGET_CLI_LANGUAGE": "en-us",
+                "VCPKG_ROOT": "D:/dev/vcpkg",
+                "VCPKG_BINARY_SOURCES": "clear;nuget,github,readwrite;default,readwrite"
+            },
+            "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
             "cacheVariables": {
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-                "CMAKE_C_COMPILER": "cl.exe",
-                "CMAKE_CXX_COMPILER": "cl.exe"
+                "VCPKG_TARGET_TRIPLET": "x64-windows"
+            }
+        },
+        {
+            "name": "Release",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "RelWithDebInfo",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "Debug",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "MinSizeRel",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "MinSizeRel"
             }
         }
     ],
     "buildPresets": [
         {
-            "name": "default-debug",
-            "displayName": "Visual Studio Community 2022 Release - amd64 - Debug",
-            "configurePreset": "default",
+            "name": "Release",
+            "displayName": "Default",
+            "configurePreset": "Release",
+            "configuration": "Release"
+        },
+        {
+            "name": "RelWithDebInfo",
+            "displayName": "Default",
+            "configurePreset": "RelWithDebInfo",
+            "configuration": "RelWithDebInfo"
+        },
+        {
+            "name": "Debug",
+            "displayName": "Default",
+            "configurePreset": "Debug",
             "configuration": "Debug"
         },
-        
         {
-            "name": "default-release",
-            "displayName": "Visual Studio Community 2022 Release - amd64 - Release",
-            "configurePreset": "default",
-            "configuration": "Release"
+            "name": "MinSizeRel",
+            "displayName": "Default",
+            "configurePreset": "MinSizeRel",
+            "configuration": "MinSizeRel"
         }
-    ]
+    ],
+    "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+            "hostOS": "Windows",
+            "intelliSenseMode": "windows-msvc-x64"
+        }
+    }
 }
