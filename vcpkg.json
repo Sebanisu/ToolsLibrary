@@ -1,5 +1,5 @@
 {
-    "name": "tools_library",
+    "name": "tools-library",
     "version": "0.1.0",
     "description": "A WIP project tools in C++",
     "builtin-baseline": "b322364f06308bdd24823f9d8f03fe0cc86fd46f",
