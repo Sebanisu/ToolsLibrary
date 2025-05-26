@@ -99,17 +99,31 @@ template<concepts::is_trivially_copyable T>
                    const std::string_view      &data)
 {
   using namespace std::string_view_literals;
+  std::error_code       ec;
   std::filesystem::path out_path =
-    std::filesystem::temp_directory_path() / file_name;
+    std::filesystem::temp_directory_path(ec) / file_name;
+
+  if (ec) {
+    std::cerr << "Failed to get temp directory for file '" << file_name.string()
+              << "': " << ec.message() << '\n';
+    return std::nullopt;
+  }
+
   auto fp = std::fstream(out_path, std::ios::binary | std::ios::out);
   if (fp.is_open()) {
     const auto write = [&fp](const std::string_view &buffer) {
       fp.write(std::data(buffer), static_cast<long>(std::size(buffer)));
     };
     write(data);
+  } else {
+    std::cerr << "Failed to open file '" << out_path.string()
+              << "' for writing: " << std::strerror(errno) << '\n';
+    return std::nullopt;
   }
+
   return out_path;
 }
+
 /**
  * Holds number sequence and has operator to pass a lambda that takes 1 of the
  * sequence as a template parameter.
